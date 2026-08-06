@@ -1,0 +1,476 @@
+/* RS AZRA Color Theme */
+
+:root {
+    /* Berganti ke tema 2 warna Azra sesuai request */
+    --color-primary-yellow: #007774;
+    --color-primary-yellow-light: #1a918d;
+    --color-primary-green: #81bd41;
+    --color-primary-green-light: #a5d762;
+    --color-accent-teal: #007774;
+    --color-accent-teal-light: #1a918d;
+    --color-secondary-gray: #F5F5F5;
+}
+
+/* Font global */
+body, * {
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Border-radius override: lebih lancip di seluruh aplikasi ── */
+.rounded-sm   { border-radius: 0.125rem !important; }
+.rounded      { border-radius: 0.2rem   !important; }
+.rounded-md   { border-radius: 0.25rem  !important; }
+.rounded-lg   { border-radius: 0.35rem  !important; }
+.rounded-xl   { border-radius: 0.5rem   !important; }
+.rounded-2xl  { border-radius: 0.65rem  !important; }
+.rounded-3xl  { border-radius: 0.85rem  !important; }
+.rounded-full { border-radius: 9999px   !important; }
+
+/* Accent Line Styles */
+.accent-left-yellow {
+    position: relative;
+    border-left: 4px solid var(--color-primary-green);
+    padding-left: 0;
+}
+
+.accent-left-green {
+    position: relative;
+    border-left: 4px solid var(--color-accent-teal);
+    padding-left: 0;
+}
+
+.accent-left-teal {
+    position: relative;
+    border-left: 4px solid var(--color-accent-teal);
+    padding-left: 0;
+}
+
+.accent-top-yellow {
+    border-top: 4px solid var(--color-primary-green);
+}
+
+.accent-top-green {
+    border-top: 4px solid var(--color-accent-teal);
+}
+
+.accent-top-teal {
+    border-top: 4px solid var(--color-accent-teal);
+}
+
+/* Header Bar - Solid Teal */
+.header-bar-gradient {
+    background: var(--color-accent-teal);
+}
+
+/* Card Styles */
+.card-accent {
+    background: white;
+    border-radius: 0.35rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--color-primary-green);
+}
+
+.card-accent:hover {
+    box-shadow: 0 4px 12px rgba(27, 113, 73, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Card with Left Accent */
+.card-left-accent {
+    background: white;
+    border-radius: 0.35rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid var(--color-primary-green);
+    transition: all 0.3s ease;
+}
+
+.card-left-accent:hover {
+    box-shadow: 0 4px 12px rgba(27, 113, 73, 0.15);
+    transform: translateX(4px);
+}
+
+.card-left-accent-yellow {
+    border-left-color: var(--color-primary-yellow);
+}
+
+.card-left-accent-teal {
+    border-left-color: var(--color-accent-teal);
+}
+
+/* Badge Styles */
+.badge-primary {
+    background-color: var(--color-primary-green);
+    color: white;
+}
+
+.badge-yellow {
+    background-color: var(--color-primary-green);
+    color: white;
+}
+
+.badge-teal {
+    background-color: var(--color-accent-teal);
+    color: white;
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: var(--color-primary-green);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-primary-green-light);
+    transition: left 0.3s ease;
+    z-index: -1;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-green-light);
+}
+
+.btn-yellow {
+    background-color: var(--color-primary-green);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-yellow:hover {
+    background-color: var(--color-primary-green-light);
+}
+
+.btn-teal {
+    background-color: var(--color-accent-teal);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-teal:hover {
+    background-color: var(--color-accent-teal-light);
+}
+
+/* Secondary Button - Lime Green Support Color */
+.btn-secondary {
+    background-color: var(--color-brand-secondary);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-brand-secondary-light);
+}
+
+/* Outline Secondary Button */
+.btn-secondary-outline {
+    background-color: transparent;
+    color: var(--color-brand-secondary);
+    border: 2px solid var(--color-brand-secondary);
+    transition: all 0.3s ease;
+}
+
+.btn-secondary-outline:hover {
+    background-color: var(--color-brand-secondary);
+    color: white;
+}
+
+/* Status Badge Styles */
+.status-pending {
+    background-color: #FEF3C7;
+    color: #92400E;
+    border-left: 3px solid var(--color-primary-yellow);
+}
+
+.status-approved {
+    background-color: #D1FAE5;
+    color: #065F46;
+    border-left: 3px solid var(--color-primary-green);
+}
+
+.status-rejected {
+    background-color: #FEE2E2;
+    color: #991B1B;
+    border-left: 3px solid #DC2626;
+}
+
+.status-completed {
+    background-color: #DBEAFE;
+    color: #0C2340;
+    border-left: 3px solid var(--color-accent-teal);
+}
+
+/* Sidebar Styles */
+.sidebar-nav-item {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.sidebar-nav-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar-nav-item:hover::before {
+    background-color: var(--color-primary-yellow);
+}
+
+.sidebar-nav-item.active::before {
+    background-color: var(--color-primary-green);
+}
+
+/* Header Button Hover */
+.header-btn {
+    background-color: #007774 !important;
+    color: white !important;
+    border-color: #007774 !important;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.header-btn svg {
+    color: white !important;
+}
+
+.header-btn:hover {
+    background-color: rgba(0,119,116,0.08) !important;
+    color: #007774 !important;
+    border-color: rgba(0,119,116,0.3) !important;
+}
+
+.header-btn:hover svg {
+    color: #007774 !important;
+}
+
+/* Clean Sidebar Link */
+.sidebar-link {
+    color: #64748b;
+    text-decoration: none;
+}
+
+.sidebar-link:hover {
+    background-color: #007774;
+    color: white;
+}
+
+.sidebar-link:hover .sidebar-icon {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.sidebar-link .sidebar-icon {
+    background-color: #f1f5f9;
+    color: #94a3b8;
+}
+
+.sidebar-link-active {
+    background-color: #007774 !important;
+    color: white !important;
+}
+
+.sidebar-link-active .sidebar-icon {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+/* Form Elements */
+.input-focus:focus {
+    border-color: var(--color-primary-green);
+    box-shadow: 0 0 0 3px rgba(27, 113, 73, 0.1);
+}
+
+.input-focus {
+    border-color: #E5E7EB;
+    transition: all 0.3s ease;
+}
+
+/* Solid Text - Lime Green */
+.text-gradient {
+    color: var(--color-primary-green);
+    font-weight: 600;
+}
+
+/* Tailwind Emerald/Teal overrides to match brand color palette */
+:root {
+    --color-brand-primary: #007774;
+    --color-brand-primary-light: #1a918d;
+    --color-brand-secondary: #81bd41;
+    --color-brand-secondary-light: #a5d762;
+    --color-brand-surface: #f4f9f2;
+}
+
+.bg-emerald-50  { background-color: #e8f8e8 !important; }
+.bg-emerald-100 { background-color: #d5f0c8 !important; }
+.bg-emerald-300 { background-color: #8acc83 !important; }
+.bg-emerald-400 { background-color: #68c45f !important; }
+.bg-emerald-600 { background-color: var(--color-brand-primary) !important; }
+.bg-teal-400   { background-color: #2ba5a1 !important; }
+
+.border-emerald-100 { border-color: #c9e8cb !important; }
+.border-emerald-200 { border-color: #aee0a5 !important; }
+.border-emerald-400 { border-color: #68c45f !important; }
+
+.text-emerald-50  { color: #e8f8e8 !important; }
+.text-emerald-100 { color: #c8e9c4 !important; }
+.text-emerald-500 { color: var(--color-brand-primary) !important; }
+.text-emerald-600 { color: #6dac3a !important; }
+.text-emerald-700 { color: var(--color-brand-primary) !important; }
+.text-emerald-800 { color: #4d8f2f !important; }
+.text-emerald-900 { color: #3f7127 !important; }
+
+.ring-emerald-200 { --tw-ring-color: rgba(129, 189, 65, 0.5) !important; }
+.focus\:ring-emerald-500,
+.focus\:ring-emerald-500:focus {
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 0 0 0 3px rgba(0, 119, 116, 0.35) !important;
+}
+
+.from-emerald-50  { background-color: #e8f8e8 !important; }
+.from-emerald-100 { background-color: #d5f0c8 !important; }
+.from-emerald-500 { background-color: var(--color-brand-primary) !important; }
+.from-emerald-600 { background-color: var(--color-brand-primary) !important; }
+.from-emerald-700 { background-color: #6dac3a !important; }
+.via-emerald-300 { background-color: #8acc83 !important; }
+.via-emerald-600 { background-color: var(--color-brand-primary) !important; }
+.to-teal-600 { background-color: var(--color-brand-primary) !important; }
+.to-teal-500,
+.to-teal-800 { background-color: var(--color-brand-primary) !important; }
+
+.bg-gradient-to-br.from-emerald-600.to-teal-600 {
+    background-color: var(--color-brand-primary) !important;
+}
+.bg-gradient-to-r.from-emerald-600.to-teal-500,
+.bg-gradient-to-r.from-emerald-600.to-teal-600,
+.bg-gradient-to-r.from-emerald-700.to-teal-500 {
+    background-color: var(--color-brand-primary) !important;
+}
+
+/* Section Divider */
+.section-divider {
+    position: relative;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.section-divider::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary-yellow) 0%, var(--color-primary-green) 50%, var(--color-accent-teal) 100%);
+}
+
+/* Icon Wrapper */
+.icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(135deg, rgba(255, 199, 0, 0.1) 0%, rgba(27, 113, 73, 0.1) 100%);
+    color: var(--color-primary-green);
+}
+
+.icon-wrapper-yellow {
+    background: linear-gradient(135deg, rgba(255, 199, 0, 0.15) 0%, rgba(255, 199, 0, 0.05) 100%);
+    color: var(--color-primary-yellow);
+}
+
+.icon-wrapper-teal {
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.1) 0%, rgba(13, 148, 136, 0.05) 100%);
+    color: var(--color-accent-teal);
+}
+
+/* Form Input Styling — border normal abu-abu, hijau hanya saat focus */
+input,
+select,
+textarea {
+    border-color: #CBD5E1 !important;
+    --tw-ring-shadow: none !important;
+    box-shadow: none !important;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.focus\:ring-2:focus,
+.focus\:border-emerald-500:focus,
+.focus\:ring-emerald-500:focus {
+    border-color: var(--color-brand-primary) !important;
+    --tw-ring-color: rgba(0, 119, 116, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(0, 119, 116, 0.1) !important;
+    outline: none;
+}
+
+/* Paksa hapus ring saat tidak focus */
+input:not(:focus),
+select:not(:focus),
+textarea:not(:focus) {
+    --tw-ring-shadow: 0 0 #0000 !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+    box-shadow: none !important;
+}
+
+/* Link & Active States */
+a {
+    color: var(--color-brand-primary);
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--color-brand-primary-light);
+}
+
+/* Active/Selected States */
+.active,
+.is-active,
+[aria-current="page"] {
+    color: var(--color-brand-primary) !important;
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+    .card-accent {
+        border-radius: 0.25rem;
+    }
+
+    .card-left-accent {
+        border-radius: 0.25rem;
+    }
+}
