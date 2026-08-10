@@ -30,6 +30,9 @@ class User extends Authenticatable
         'password',
         'role',
         'priority_level',
+        'simutu_id',
+        'simutu_status',
+        'simutu_synced_at',
     ];
 
     /**

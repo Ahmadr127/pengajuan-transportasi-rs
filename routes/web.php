@@ -93,6 +93,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/laporan/{transportRequest}', [AdminTransportController::class, 'laporanDetail'])->name('laporan.detail');
     
     // Master Data
+    Route::post('users/sync-simutu', [\App\Http\Controllers\Admin\UserController::class, 'syncFromSimutu'])->name('users.sync-simutu');
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
     Route::resource('vehicles', \App\Http\Controllers\Admin\VehicleController::class);
     Route::resource('drivers', \App\Http\Controllers\Admin\DriverController::class);

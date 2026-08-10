@@ -6,13 +6,25 @@
                 <h1 class="fw-bold text-slate-800 mb-0" style="font-size:1.1rem;">Master User</h1>
                 <p class="text-slate-500 text-xs mt-1 mb-0">Kelola data user sistem</p>
             </div>
-            <a href="{{ route('admin.users.create') }}"
-               class="btn btn-sp-primary d-inline-flex align-items-center gap-2 text-xs">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="white" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-                <span class="fw-600">Tambah</span>
-            </a>
+            <div class="d-flex align-items-center gap-2">
+                <form method="POST" action="{{ route('admin.users.sync-simutu') }}" onsubmit="return confirm('Sinkronkan data pegawai dari Simutu? User yang belum ada akan dibuat otomatis.');">
+                    @csrf
+                    <button type="submit"
+                            class="btn btn-outline-sp d-inline-flex align-items-center gap-2 text-xs">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M3.35 9a9 9 0 0114.3-3.36L21 9M20.65 15a9 9 0 01-14.3 3.36L3 15"/>
+                        </svg>
+                        <span class="fw-600">Sync Simutu</span>
+                    </button>
+                </form>
+                <a href="{{ route('admin.users.create') }}"
+                   class="btn btn-sp-primary d-inline-flex align-items-center gap-2 text-xs">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="white" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span class="fw-600">Tambah</span>
+                </a>
+            </div>
         </div>
 
         @if(session('success'))

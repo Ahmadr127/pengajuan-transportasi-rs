@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\SimutuUserSyncService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -192,5 +193,20 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil dihapus.');
+    }
+
+    public function syncFromSimutu()
+    {
+        try {
+            $stats = app(SimutuUserSyncService::class)->sync();
+
+            return redirect()->route('admin.users.index')
+                ->with('success', "Simutu sync selesai: {$stats['checked']} dicek, {$stats['created']} dibuat, {$stats['updated']} diperbarui.");
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal sync dari Simutu: '.$e->getMessage());
+
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Gagal sync dari Simutu: '.$e->getMessage());
+        }
     }
 }
