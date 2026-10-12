@@ -90,9 +90,9 @@
                     </div>
                     <div class="col-6 col-sm-3">
                         <label class="form-label text-xxs fw-600 text-slate-600 mb-1">Jam Dari <span class="text-danger">*</span></label>
-                        <input type="text" name="jam" value="{{ old('jam') }}" placeholder="00:00" required
-                            pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" maxlength="5" inputmode="numeric"
-                            class="form-control form-control-sm">
+                        <input type="text" id="jam" name="jam" value="{{ old('jam') }}" placeholder="HH:mm" required autocomplete="off"
+                            pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$" maxlength="5" inputmode="numeric"
+                            class="form-control form-control-sm cursor-pointer">
                     </div>
                     <div class="col-6 col-sm-3" x-show="!sampaiSelesai && !isRecurring">
                         <label class="form-label text-xxs fw-600 text-slate-600 mb-1">Tgl Sampai <span class="text-danger">*</span></label>
@@ -102,9 +102,9 @@
                     </div>
                     <div class="col-6 col-sm-3" x-show="!sampaiSelesai">
                         <label class="form-label text-xxs fw-600 text-slate-600 mb-1">Jam Sampai <span class="text-danger">*</span></label>
-                        <input type="text" name="jam_sampai" value="{{ old('jam_sampai') }}" placeholder="00:00"
-                            pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" maxlength="5" inputmode="numeric"
-                            class="form-control form-control-sm">
+                        <input type="text" id="jam_sampai" name="jam_sampai" value="{{ old('jam_sampai') }}" placeholder="HH:mm" autocomplete="off"
+                            pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$" maxlength="5" inputmode="numeric"
+                            class="form-control form-control-sm cursor-pointer">
                     </div>
                 </div>
 
@@ -263,6 +263,21 @@ function initFlatpickr() {
     });
 }
 
+function initTimePickers() {
+    if (typeof flatpickr === 'undefined') { setTimeout(initTimePickers, 50); return; }
+    // Time-only picker format 24 jam (HH:mm). time_24hr menghilangkan AM/PM di semua browser/HP
+    // (tampilan <input type="time"> native mengikuti locale browser/OS sehingga tidak bisa dipaksa 24 jam via HTML).
+    const timeCfg = { enableTime:true, noCalendar:true, dateFormat:'H:i', time_24hr:true,
+        minuteIncrement:1, allowInput:true, disableMobile:true };
+    ['#jam', '#jam_sampai'].forEach(sel => {
+        const el = document.querySelector(sel);
+        if (!el || el._flatpickr) return;
+        flatpickr(el, { ...timeCfg, defaultDate: el.value || null,
+            onChange(_, d) { el.value = d; el.dispatchEvent(new Event('input')); el.dispatchEvent(new Event('change')); }
+        });
+    });
+}
+
 document.getElementById('umumForm').addEventListener('submit', function(e) {
     const btn = document.getElementById('submitBtn');
     if (btn.dataset.submitted === '1') { e.preventDefault(); return; }
@@ -272,9 +287,11 @@ document.getElementById('umumForm').addEventListener('submit', function(e) {
 
 document.addEventListener('DOMContentLoaded', function() {
     initFlatpickr();
+    initTimePickers();
 
     function getMinJam(tanggalVal) {
-        const t = new Date(), ts = t.toISOString().slice(0,10);
+        const t = new Date();
+        const ts = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
         if (tanggalVal === ts) return String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
         return null;
     }
@@ -287,25 +304,12 @@ document.addEventListener('DOMContentLoaded', function() {
         inp.classList.remove('is-invalid');
         inp.parentNode.querySelector('.jam-error-msg')?.remove();
     }
-    function setupTimeInput(el) {
-        el.addEventListener('input', function() {
-            let v = el.value.replace(/[^0-9]/g,'');
-            if (v.length > 2) v = v.slice(0,2)+':'+v.slice(2,4);
-            el.value = v;
-        });
-        el.addEventListener('blur', function() {
-            let v = el.value;
-            if (v.length===4 && !v.includes(':')) v = v.slice(0,2)+':'+v.slice(2,4);
-            if (v.includes(':')) {
-                const [h,m] = v.split(':');
-                el.value = String(Math.min(parseInt(h)||0,23)).padStart(2,'0')+':'+String(Math.min(parseInt(m)||0,59)).padStart(2,'0');
-            }
-        });
-        el.addEventListener('keypress', e => { if (!/[0-9]/.test(e.key)) e.preventDefault(); });
-    }
+    const jamValidators = {};
+    function isJamVisible(el) { return !!el && el.offsetParent !== null; }
     function enforceMinJam(jamInput, tanggalId) {
         const tanggalHidden = document.getElementById(tanggalId);
-        jamInput.addEventListener('blur', function() {
+        // Perbandingan string "HH:mm" 24 jam valid karena zero-padded (mis. "08:58" < "13:30").
+        function validateJam() {
             const isRec = document.querySelector('input[name="is_recurring"]')?.checked;
             const minJam = getMinJam(tanggalHidden?.value || '');
             if (!isRec && minJam && jamInput.value && jamInput.value < minJam) {
@@ -318,12 +322,34 @@ document.addEventListener('DOMContentLoaded', function() {
                     showJamError(jamInput, 'Jam sampai harus lebih besar dari jam dari');
                 else clearJamError(jamInput);
             }
+        }
+        jamValidators[jamInput.name] = validateJam;
+        jamInput.addEventListener('blur', validateJam);
+        jamInput.addEventListener('change', function() {
+            validateJam();
+            // Validasi silang langsung: perubahan Jam Dari harus segera memunculkan
+            // error "Jam sampai harus lebih besar dari jam dari" tanpa menunggu
+            // user menyentuh kolom Jam Sampai.
+            if (jamInput.name === 'jam') {
+                const js = document.querySelector('input[name="jam_sampai"]');
+                if (isJamVisible(js) && js.value) jamValidators['jam_sampai']?.();
+            }
         });
         jamInput.addEventListener('input', () => clearJamError(jamInput));
     }
     ['jam','jam_sampai'].forEach(n => {
         const inp = document.querySelector(`input[name="${n}"]`);
-        if (inp) { setupTimeInput(inp); enforceMinJam(inp, n==='jam'?'tanggal':'tanggal_sampai'); }
+        if (inp) { enforceMinJam(inp, n==='jam'?'tanggal':'tanggal_sampai'); }
+    });
+    // Perubahan tanggal memengaruhi syarat "tanggal sama" pada perbandingan jam,
+    // jadi validasi ulang kedua kolom jam setiap tanggal berubah.
+    ['tanggal', 'tanggal_sampai'].forEach(id => {
+        document.getElementById(id)?.addEventListener('change', function() {
+            const jd = document.querySelector('input[name="jam"]');
+            const js = document.querySelector('input[name="jam_sampai"]');
+            if (isJamVisible(jd) && jd.value) jamValidators['jam']?.();
+            if (isJamVisible(js) && js.value) jamValidators['jam_sampai']?.();
+        });
     });
 });
 </script>

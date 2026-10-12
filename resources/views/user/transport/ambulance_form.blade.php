@@ -76,9 +76,9 @@
                     </div>
                     <div class="col-6 col-sm-3">
                         <label class="form-label text-xxs fw-600 text-slate-600 mb-1">Jam Dari <span class="text-danger">*</span></label>
-                        <input type="text" name="jam" value="{{ old('jam') }}" placeholder="00:00" required
-                            pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" maxlength="5" inputmode="numeric"
-                            class="form-control form-control-sm">
+                        <input type="text" id="jam" name="jam" value="{{ old('jam') }}" placeholder="HH:mm" required autocomplete="off"
+                            pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$" maxlength="5" inputmode="numeric"
+                            class="form-control form-control-sm cursor-pointer">
                     </div>
                     <div class="col-6 col-sm-3" x-show="!sampaiSelesai && true">
                         <label class="form-label text-xxs fw-600 text-slate-600 mb-1">Tgl Sampai <span class="text-danger">*</span></label>
@@ -88,9 +88,9 @@
                     </div>
                     <div class="col-6 col-sm-3" x-show="!sampaiSelesai">
                         <label class="form-label text-xxs fw-600 text-slate-600 mb-1">Jam Sampai <span class="text-danger">*</span></label>
-                        <input type="text" name="jam_sampai" value="{{ old('jam_sampai') }}" placeholder="00:00"
-                            pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" maxlength="5" inputmode="numeric"
-                            class="form-control form-control-sm">
+                        <input type="text" id="jam_sampai" name="jam_sampai" value="{{ old('jam_sampai') }}" placeholder="HH:mm" autocomplete="off"
+                            pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$" maxlength="5" inputmode="numeric"
+                            class="form-control form-control-sm cursor-pointer">
                     </div>
                 </div>
 
@@ -204,10 +204,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function isSampaiSelesai() { const c = document.querySelector('input[name="sampai_selesai"]'); return c && c.checked; }
 
+    // Cek ketersediaan hanya bersifat informatif — JANGAN kunci tombol submit.
+    // Pengajuan ambulance (terutama Cito) harus tetap bisa dikirim walau unit penuh,
+    // biar admin yang mengatur antrean. Tombol sebelumnya di-disabled permanen
+    // sehingga terkesan "ga jalan".
     function resetCheck() {
-        submitBtn.disabled = true;
-        statusEl.textContent = 'Cek ketersediaan diperlukan';
-        statusEl.className = 'text-xxs fw-600 text-amber-600';
+        submitBtn.disabled = false;
+        statusEl.textContent = 'Klik "Cek Ketersediaan" untuk info unit (opsional)';
+        statusEl.className = 'text-xxs fw-600 text-slate-500';
     }
 
     const form = btn.closest('form');
@@ -240,16 +244,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const data = await fetch(url.toString(), { credentials: 'same-origin' }).then(r => r.json());
-            if (data.available) {
+            if (data.total_units === 0) {
+                statusEl.textContent = '⚠ Belum ada unit ambulance aktif — pengajuan tetap bisa dikirim, admin akan menindaklanjuti';
+                statusEl.className = 'text-xxs fw-600 text-amber-600';
+            } else if (data.available) {
                 statusEl.textContent = `✓ Tersedia (${data.available_units}/${data.total_units} unit)`;
                 statusEl.className = 'text-xxs fw-600 text-emerald-600';
-                submitBtn.disabled = false;
             } else {
-                statusEl.textContent = `✗ Tidak tersedia (${data.available_units}/${data.total_units})`;
-                statusEl.className = 'text-xxs fw-600 text-danger';
-                submitBtn.disabled = true;
+                statusEl.textContent = `⚠ Unit penuh (${data.available_units}/${data.total_units}) — pengajuan tetap bisa dikirim dan akan diantrekan`;
+                statusEl.className = 'text-xxs fw-600 text-amber-600';
             }
-        } catch { statusEl.textContent = '⚠ Terjadi kesalahan'; statusEl.className = 'text-xxs fw-600 text-danger'; }
+            submitBtn.disabled = false;
+        } catch {
+            statusEl.textContent = '⚠ Gagal cek ketersediaan — pengajuan tetap bisa dikirim';
+            statusEl.className = 'text-xxs fw-600 text-amber-600';
+            submitBtn.disabled = false;
+        }
     });
     resetCheck();
 })();
@@ -266,6 +276,21 @@ function initFlatpickr() {
     });
 }
 
+function initTimePickers() {
+    if (typeof flatpickr === 'undefined') { setTimeout(initTimePickers, 50); return; }
+    // Time-only picker format 24 jam (HH:mm). time_24hr menghilangkan AM/PM di semua browser/HP
+    // (tampilan <input type="time"> native mengikuti locale browser/OS sehingga tidak bisa dipaksa 24 jam via HTML).
+    const timeCfg = { enableTime:true, noCalendar:true, dateFormat:'H:i', time_24hr:true,
+        minuteIncrement:1, allowInput:true, disableMobile:true };
+    ['#jam', '#jam_sampai'].forEach(sel => {
+        const el = document.querySelector(sel);
+        if (!el || el._flatpickr) return;
+        flatpickr(el, { ...timeCfg, defaultDate: el.value || null,
+            onChange(_, d) { el.value = d; el.dispatchEvent(new Event('input')); el.dispatchEvent(new Event('change')); }
+        });
+    });
+}
+
 document.getElementById('ambulanceForm').addEventListener('submit', function(e) {
     const btn = document.getElementById('submitBtn');
     if (btn.dataset.submitted === '1') { e.preventDefault(); return; }
@@ -275,9 +300,11 @@ document.getElementById('ambulanceForm').addEventListener('submit', function(e) 
 
 document.addEventListener('DOMContentLoaded', function() {
     initFlatpickr();
+    initTimePickers();
 
     function getMinJam(tanggalVal) {
-        const t = new Date(), ts = t.toISOString().slice(0,10);
+        const t = new Date();
+        const ts = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
         if (tanggalVal === ts) return String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
         return null;
     }
@@ -290,25 +317,12 @@ document.addEventListener('DOMContentLoaded', function() {
         inp.classList.remove('is-invalid');
         inp.parentNode.querySelector('.jam-error-msg')?.remove();
     }
-    function setupTimeInput(el) {
-        el.addEventListener('input', function() {
-            let v = el.value.replace(/[^0-9]/g,'');
-            if (v.length > 2) v = v.slice(0,2)+':'+v.slice(2,4);
-            el.value = v;
-        });
-        el.addEventListener('blur', function() {
-            let v = el.value;
-            if (v.length===4 && !v.includes(':')) v = v.slice(0,2)+':'+v.slice(2,4);
-            if (v.includes(':')) {
-                const [h,m] = v.split(':');
-                el.value = String(Math.min(parseInt(h)||0,23)).padStart(2,'0')+':'+String(Math.min(parseInt(m)||0,59)).padStart(2,'0');
-            }
-        });
-        el.addEventListener('keypress', e => { if (!/[0-9]/.test(e.key)) e.preventDefault(); });
-    }
+    const jamValidators = {};
+    function isJamVisible(el) { return !!el && el.offsetParent !== null; }
     function enforceMinJam(jamInput, tanggalId) {
         const tanggalHidden = document.getElementById(tanggalId);
-        jamInput.addEventListener('blur', function() {
+        // Perbandingan string "HH:mm" 24 jam valid karena zero-padded (mis. "08:58" < "13:30").
+        function validateJam() {
             const minJam = getMinJam(tanggalHidden?.value || '');
             if (minJam && jamInput.value && jamInput.value < minJam) {
                 showJamError(jamInput, 'Jam tidak boleh kurang dari jam sekarang'); return;
@@ -320,12 +334,34 @@ document.addEventListener('DOMContentLoaded', function() {
                     showJamError(jamInput, 'Jam sampai harus lebih besar dari jam dari');
                 else clearJamError(jamInput);
             }
+        }
+        jamValidators[jamInput.name] = validateJam;
+        jamInput.addEventListener('blur', validateJam);
+        jamInput.addEventListener('change', function() {
+            validateJam();
+            // Validasi silang langsung: perubahan Jam Dari harus segera memunculkan
+            // error "Jam sampai harus lebih besar dari jam dari" tanpa menunggu
+            // user menyentuh kolom Jam Sampai.
+            if (jamInput.name === 'jam') {
+                const js = document.querySelector('input[name="jam_sampai"]');
+                if (isJamVisible(js) && js.value) jamValidators['jam_sampai']?.();
+            }
         });
         jamInput.addEventListener('input', () => clearJamError(jamInput));
     }
     ['jam','jam_sampai'].forEach(n => {
         const inp = document.querySelector(`input[name="${n}"]`);
-        if (inp) { setupTimeInput(inp); enforceMinJam(inp, n==='jam'?'tanggal':'tanggal_sampai'); }
+        if (inp) { enforceMinJam(inp, n==='jam'?'tanggal':'tanggal_sampai'); }
+    });
+    // Perubahan tanggal memengaruhi syarat "tanggal sama" pada perbandingan jam,
+    // jadi validasi ulang kedua kolom jam setiap tanggal berubah.
+    ['tanggal', 'tanggal_sampai'].forEach(id => {
+        document.getElementById(id)?.addEventListener('change', function() {
+            const jd = document.querySelector('input[name="jam"]');
+            const js = document.querySelector('input[name="jam_sampai"]');
+            if (isJamVisible(jd) && jd.value) jamValidators['jam']?.();
+            if (isJamVisible(js) && js.value) jamValidators['jam_sampai']?.();
+        });
     });
 });
 </script>
