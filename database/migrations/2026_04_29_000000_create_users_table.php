@@ -53,6 +53,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->renameColumn('name', 'first_name');
             $table->string('last_name')->after('first_name')->nullable();
+            $table->dropUnique('users_email_unique');
             $table->dropColumn('email');
         });
 

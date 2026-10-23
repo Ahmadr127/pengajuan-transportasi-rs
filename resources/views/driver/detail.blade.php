@@ -18,6 +18,7 @@
                 <span class="badge {{ $statusCfg[0] }} d-inline-flex align-items-center rounded-pill text-xxs fw-bold">
                     {{ $statusCfg[1] }}
                 </span>
+                @can('driver.task.print')
                 <a href="{{ route('driver.print', $transportRequest) }}?from=driver" target="_blank"
                    class="d-inline-flex align-items-center gap-1 rounded px-3 py-2 text-xs fw-600"
                    style="background-color:#00685E; color:white !important;">
@@ -26,6 +27,7 @@
                     </svg>
                     Print
                 </a>
+                @endcan
                 <a href="{{ route('driver.dashboard') }}"
                    class="d-inline-flex align-items-center rounded border border-slate-300 bg-white px-3 py-2 text-xs fw-600 text-slate-700">
                     Kembali

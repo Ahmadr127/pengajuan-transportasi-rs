@@ -6,6 +6,7 @@
                 <p class="text-xs text-slate-500 mt-1 mb-0">Data lengkap seluruh pengajuan transportasi</p>
             </div>
             <div class="d-flex align-items-center gap-2">
+                @can('report.print')
                 <a href="{{ route('admin.laporan.print', request()->query()) }}"
                    target="_blank"
                    class="btn btn-sp-primary btn-sm d-inline-flex align-items-center gap-1">
@@ -14,6 +15,8 @@
                     </svg>
                     Print PDF
                 </a>
+                @endcan
+                @can('report.export')
                 <a href="{{ route('admin.laporan.export', request()->query()) }}"
                    class="btn btn-sp-primary btn-sm d-inline-flex align-items-center gap-1">
                     <svg style="width:.875rem;height:.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -22,6 +25,7 @@
                     </svg>
                     Export Excel
                 </a>
+                @endcan
             </div>
         </div>
 

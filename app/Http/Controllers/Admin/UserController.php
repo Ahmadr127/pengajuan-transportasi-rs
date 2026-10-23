@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use App\Services\SimutuUserSyncService;
 use Illuminate\Http\Request;
@@ -56,16 +57,19 @@ class UserController extends Controller
         if ($request->filled('posisi'))     $query->whereRaw('LOWER(posisi_pekerjaan) LIKE ?', [$like($request->posisi)]);
         if ($request->filled('profesi'))    $query->whereRaw('LOWER(profesi) LIKE ?', [$like($request->profesi)]);
         if ($request->filled('jabatan'))    $query->whereRaw('LOWER(jabatan) LIKE ?', [$like($request->jabatan)]);
-        if ($request->filled('role'))       $query->where('role', $request->role);
+        if ($request->filled('role'))       $query->whereHas('roles', fn ($q) => $q->where('name', $request->role));
 
         $users = $query->paginate(10)->withQueryString();
+        $roles = Role::query()->orderBy('id')->get();
 
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index', compact('users', 'roles'));
     }
 
     public function create()
     {
-        return view('admin.users.create');
+        $roles = Role::query()->orderBy('id')->get();
+
+        return view('admin.users.create', compact('roles'));
     }
 
     public function store(Request $request)
@@ -78,7 +82,7 @@ class UserController extends Controller
             'posisi_pekerjaan' => ['nullable', 'string', 'max:255'],
             'profesi' => ['nullable', 'string', 'max:255'],
             'jabatan' => ['nullable', 'string', 'max:255'],
-            'role' => ['required', 'in:user,admin,driver'],
+            'role_id' => ['required', 'exists:roles,id'],
             'priority_level' => ['nullable', 'integer', 'in:0,1'],
         ]);
 
@@ -89,6 +93,7 @@ class UserController extends Controller
         }
 
         $data = $validator->validated();
+        $role = Role::findOrFail($data['role_id']);
 
         $parsed = $this->parseNama($data['nama_lengkap']);
 
@@ -100,7 +105,7 @@ class UserController extends Controller
             $username = $baseUsername . $i++;
         }
 
-        User::create([
+        $user = User::create([
             'first_name'       => $parsed['firstName'],
             'last_name'        => $parsed['lastName'],
             'username'         => $username,
@@ -110,9 +115,11 @@ class UserController extends Controller
             'posisi_pekerjaan' => $data['posisi_pekerjaan'] ?? null,
             'profesi'          => $data['profesi'] ?? null,
             'jabatan'          => $data['jabatan'] ?? null,
-            'role'             => $data['role'],
+            'role'             => $role->name,
             'priority_level'   => $data['priority_level'] ?? 0,
         ]);
+
+        $user->syncRolesByName([$role->name]);
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil ditambahkan.');
@@ -120,7 +127,9 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return view('admin.users.edit', compact('user'));
+        $roles = Role::query()->orderBy('id')->get();
+
+        return view('admin.users.edit', compact('user', 'roles'));
     }
 
     public function update(Request $request, User $user)
@@ -133,7 +142,7 @@ class UserController extends Controller
             'posisi_pekerjaan' => ['nullable', 'string', 'max:255'],
             'profesi' => ['nullable', 'string', 'max:255'],
             'jabatan' => ['nullable', 'string', 'max:255'],
-            'role' => ['required', 'in:user,admin,driver'],
+            'role_id' => ['required', 'exists:roles,id'],
             'priority_level' => ['nullable', 'integer', 'in:0,1'],
         ]);
 
@@ -144,6 +153,15 @@ class UserController extends Controller
         }
 
         $data = $validator->validated();
+        $newRole = Role::findOrFail($data['role_id']);
+
+        // Jangan sampai super admin terakhir kehilangan akses.
+        if ($user->isSuperAdmin() && ! $newRole->is_super) {
+            $superAdmins = User::whereHas('roles', fn ($q) => $q->where('is_super', true))->count();
+            if ($superAdmins <= 1) {
+                return back()->with('error', 'Tidak dapat mengubah role super admin terakhir.');
+            }
+        }
 
         // Gunakan nama dari DB jika tidak dikirim
         $namaLengkap = !empty($data['nama_lengkap'])
@@ -169,7 +187,7 @@ class UserController extends Controller
             'posisi_pekerjaan' => $data['posisi_pekerjaan'] ?? null,
             'profesi'          => $data['profesi'] ?? null,
             'jabatan'          => $data['jabatan'] ?? null,
-            'role'             => $data['role'],
+            'role'             => $newRole->name,
             'priority_level'   => $data['priority_level'] ?? 0,
         ];
 
@@ -178,6 +196,7 @@ class UserController extends Controller
         }
 
         $user->update($updateData);
+        $user->syncRolesByName([$newRole->name]);
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil diupdate.');
@@ -187,6 +206,13 @@ class UserController extends Controller
     {
         if ($user->id === auth()->id()) {
             return back()->with('error', 'Tidak dapat menghapus akun sendiri.');
+        }
+
+        if ($user->isSuperAdmin()) {
+            $superAdmins = User::whereHas('roles', fn ($q) => $q->where('is_super', true))->count();
+            if ($superAdmins <= 1) {
+                return back()->with('error', 'Tidak dapat menghapus super admin terakhir.');
+            }
         }
 
         $user->delete();

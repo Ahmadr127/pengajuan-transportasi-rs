@@ -40,6 +40,7 @@
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     @if($transportRequest->status !== 'tidak_disetujui')
+                        @can('transport.request.print')
                         <a href="{{ route('admin.transport.print', $transportRequest) }}" target="_blank"
                             class="btn btn-sp-primary btn-sm d-inline-flex align-items-center gap-1">
                             <svg style="width:.875rem;height:.875rem;" fill="none" stroke="currentColor"
@@ -49,6 +50,7 @@
                             </svg>
                             Cetak Surat
                         </a>
+                        @endcan
                     @endif
                     <a href="{{ route('admin.transport.index') }}"
                         class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 text-xs fw-600">
@@ -403,6 +405,7 @@
 
                         @php $isBlocked = false; @endphp
 
+                        @canany(['transport.request.approve', 'transport.request.reject', 'transport.request.assign', 'transport.request.complete', 'transport.request.update'])
                         <form method="POST" action="{{ route('admin.transport.update', $transportRequest) }}"
                             class="px-3 py-3 text-xs" id="mainFormWrapper">
                             @csrf
@@ -415,17 +418,27 @@
                                 <select name="status" x-model="currentStatus" class="form-select form-select-sm">
                                     @if($transportRequest->status === 'diajukan')
                                         <option value="diajukan">Diajukan (Menunggu)</option>
-                                        @if($unitAvailable || ($transportRequest->user && $transportRequest->user->isPriority()))
-                                            <option value="diproses">&#10003; Setujui</option>
-                                        @endif
-                                        <option value="tidak_disetujui">&#10007; Tolak</option>
+                                        @can('transport.request.approve')
+                                            @if($unitAvailable || ($transportRequest->user && $transportRequest->user->isPriority()))
+                                                <option value="diproses">&#10003; Setujui</option>
+                                            @endif
+                                        @endcan
+                                        @can('transport.request.reject')
+                                            <option value="tidak_disetujui">&#10007; Tolak</option>
+                                        @endcan
                                     @elseif($transportRequest->status === 'diproses')
                                         <option value="diproses">Disetujui</option>
-                                        <option value="digunakan">&rarr; Tandai Digunakan</option>
+                                        @can('transport.request.assign')
+                                            <option value="digunakan">&rarr; Tandai Digunakan</option>
+                                        @endcan
                                     @elseif($transportRequest->status === 'digunakan')
                                         <option value="digunakan">Digunakan</option>
-                                        <option value="selesai">&#10003; Tandai Selesai</option>
-                                        <option value="tidak_disetujui">&#10007; Batalkan</option>
+                                        @can('transport.request.complete')
+                                            <option value="selesai">&#10003; Tandai Selesai</option>
+                                        @endcan
+                                        @can('transport.request.reject')
+                                            <option value="tidak_disetujui">&#10007; Batalkan</option>
+                                        @endcan
                                     @elseif($transportRequest->status === 'selesai')
                                         <option value="selesai">Selesai</option>
                                     @elseif($transportRequest->status === 'tidak_disetujui')
@@ -578,6 +591,7 @@
                             </div>
 
                             @if($transportRequest->status === 'digunakan')
+                                @can('transport.request.assign')
                                 <div x-show="currentStatus !== 'selesai'" class="mb-3">
                                     <button type="button" @click="editOpen = !editOpen"
                                         class="btn btn-sm w-100 d-inline-flex align-items-center justify-content-center gap-2 fw-600 transition"
@@ -590,6 +604,7 @@
                                         <span x-text="editOpen ? 'Tutup Edit' : 'Edit Unit / Driver / KM'"></span>
                                     </button>
                                 </div>
+                                @endcan
                             @endif
 
                             <div x-show="currentStatus !== savedStatus">
@@ -604,10 +619,12 @@
                                 </button>
                             </div>
                         </form>
+                        @endcanany
 
                         @if($transportRequest->status === 'digunakan')
                             <div x-show="editOpen && currentStatus !== 'selesai'" x-transition
                                 class="px-3 pb-3 border-top border-slate-200 pt-3">
+                                @can('transport.request.assign')
                                 <form method="POST" action="{{ route('admin.transport.update', $transportRequest) }}"
                                     class="text-xs" id="editDigunakanFormEl">
                                     @csrf
@@ -667,6 +684,7 @@
                                     <button type="submit" class="btn btn-sp-primary btn-sm w-100 fw-600">Simpan
                                         Perubahan</button>
                                 </form>
+                                @endcan
                             </div>
                         @endif
                     </div>

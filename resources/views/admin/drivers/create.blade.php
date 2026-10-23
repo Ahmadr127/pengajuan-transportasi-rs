@@ -59,7 +59,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-2 pt-2 border-top border-slate-100">
+                    @can('driver.create')
                     <button type="submit" class="btn btn-sp-primary text-xs fw-600">Simpan</button>
+                    @endcan
                     <a href="{{ route('admin.drivers.index') }}"
                        class="btn btn-sp-outline text-xs fw-600">Batal</a>
                 </div>

@@ -75,7 +75,7 @@
                     </form>
                 </div>
                 <div class="col-6">
-                    <a href="{{ auth()->user()->isAdmin() ? route('admin.transport.show', $transportRequest) : route('pengajuan.index') }}"
+                    <a href="{{ $backUrl }}"
                        class="btn btn-sp-outline w-100 d-inline-flex align-items-center justify-content-center gap-2 text-xs fw-600 py-2">
                         Kembali
                     </a>

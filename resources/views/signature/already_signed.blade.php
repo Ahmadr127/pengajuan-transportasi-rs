@@ -13,7 +13,7 @@
             </div>
             <div class="p-4 text-center">
                 <p class="text-sm text-slate-600 mb-3">Tidak ada tanda tangan yang diperlukan untuk pengajuan ini saat ini.</p>
-                <a href="{{ auth()->user()->isAdmin() ? route('admin.transport.show', $transportRequest) : route('pengajuan.index') }}"
+                <a href="{{ $backUrl }}"
                    class="btn btn-sp-primary d-inline-flex align-items-center justify-content-center gap-2 px-4 py-2 text-sm fw-600">
                     Kembali
                 </a>

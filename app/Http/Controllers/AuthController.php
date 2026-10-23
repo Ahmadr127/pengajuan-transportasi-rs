@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Services\LandingResolver;
+use App\Services\SimutuUserSyncService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use App\Services\SimutuUserSyncService;
 
 class AuthController extends Controller
 {
+    public function __construct(private readonly LandingResolver $landing)
+    {
+    }
+
     public function create()
     {
         if (Auth::check()) {
-            if (Auth::user()->isAdmin()) {
-                return redirect()->route('admin.dashboard');
-            }
-            if (Auth::user()->isDriver()) {
-                return redirect()->route('driver.dashboard');
-            }
-            return redirect()->route('dashboard');
+            return $this->landing->redirectFor(Auth::user());
         }
 
         return view('auth.login');
@@ -40,9 +41,9 @@ class AuthController extends Controller
             Log::warning('Simutu lazy sync gagal saat login: '.$e->getMessage());
         }
 
-        $user = \App\Models\User::where('username', $request->username)->first();
+        $user = User::where('username', $request->username)->first();
 
-        if (!$user || !\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             return back()
                 ->withErrors(['username' => 'Username atau password salah.'])
                 ->onlyInput('username');
@@ -60,14 +61,7 @@ class AuthController extends Controller
         Auth::login($user, $remember);
         $request->session()->regenerate();
 
-        if (Auth::user()->isAdmin()) {
-            return redirect()->route('admin.dashboard');
-        }
-        if (Auth::user()->isDriver()) {
-            return redirect()->route('driver.dashboard');
-        }
-        
-        return redirect()->route('dashboard');
+        return $this->landing->redirectFor(Auth::user());
     }
 
     public function destroy(Request $request)
@@ -80,4 +74,3 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 }
-

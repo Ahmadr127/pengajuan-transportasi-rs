@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\TransportRequest;
+use App\Support\AclCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
@@ -45,6 +46,11 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    /** @var array<int, string>|null */
+    protected ?array $permissionNamesCache = null;
+
+    protected ?bool $superAdminCache = null;
+
     /**
      * Get the attributes that should be cast.
      *
@@ -55,6 +61,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'priority_level' => 'integer',
         ];
     }
 
@@ -68,19 +75,117 @@ class User extends Authenticatable
         return $this->hasOne(\App\Models\Driver::class);
     }
 
-    public function isAdmin(): bool
+    public function roles(): BelongsToMany
     {
-        return $this->role === 'admin';
+        return $this->belongsToMany(Role::class, 'role_user')->withTimestamps();
     }
 
-    public function isDriver(): bool
+    /**
+     * Semua nama permission milik user (gabungan dari seluruh role).
+     *
+     * @return array<int, string>
+     */
+    public function permissionNames(): array
     {
-        return $this->role === 'driver';
+        if ($this->permissionNamesCache !== null) {
+            return $this->permissionNamesCache;
+        }
+
+        if (! $this->exists) {
+            return $this->permissionNamesCache = [];
+        }
+
+        $cacheKey = 'acl.user.'.$this->getKey().'.'.AclCache::version();
+
+        return $this->permissionNamesCache = Cache::remember($cacheKey, 300, function () {
+            $this->loadMissing('roles.permissions');
+
+            return $this->roles
+                ->flatMap(fn (Role $role) => $role->permissions->pluck('name'))
+                ->unique()
+                ->values()
+                ->all();
+        });
     }
-    
+
+    public function hasPermission(string $permission): bool
+    {
+        return in_array($permission, $this->permissionNames(), true);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        if ($this->superAdminCache !== null) {
+            return $this->superAdminCache;
+        }
+
+        if (! $this->exists) {
+            return $this->superAdminCache = false;
+        }
+
+        $this->loadMissing('roles');
+
+        return $this->superAdminCache = $this->roles->contains(
+            fn (Role $role) => (bool) $role->is_super
+        );
+    }
+
+    public function hasAnyPermission(array $permissions): bool
+    {
+        foreach ($permissions as $permission) {
+            if ($this->hasPermission($permission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function primaryRole(): ?Role
+    {
+        return $this->roles()->orderBy('roles.id')->first();
+    }
+
+    public function primaryRoleLabel(): string
+    {
+        return $this->primaryRole()?->label ?? ucfirst((string) $this->role);
+    }
+
+    /**
+     * Sinkronkan role berdasarkan nama role (dipakai admin UI & sync Simutu).
+     *
+     * @param  array<int, string>  $roleNames
+     */
+    public function syncRolesByName(array $roleNames): void
+    {
+        $roles = Role::query()->whereIn('name', $roleNames)->get();
+
+        $this->roles()->sync($roles->pluck('id')->all());
+
+        $primary = $roles->sortBy('id')->first();
+        if ($primary) {
+            $this->forceFill(['role' => $primary->name])->saveQuietly();
+        }
+
+        $this->permissionNamesCache = null;
+        $this->superAdminCache = null;
+        AclCache::flush();
+    }
+
+    public function scopeWithPermission($query, string $permission)
+    {
+        return $query->where(function ($query) use ($permission) {
+            $query->whereHas('roles.permissions', function ($q) use ($permission) {
+                $q->where('name', $permission);
+            })->orWhereHas('roles', function ($q) {
+                $q->where('is_super', true);
+            });
+        });
+    }
+
     public function isPriority(): bool
     {
-        return $this->priority_level === 1;
+        return (int) $this->priority_level === 1;
     }
 
     public function getFullNameAttribute(): string

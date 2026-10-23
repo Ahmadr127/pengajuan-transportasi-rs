@@ -6,6 +6,7 @@
                 <h1 class="fw-bold text-slate-800 mb-0" style="font-size:1.1rem;">Master Kendaraan</h1>
                 <p class="text-slate-500 text-xs mt-1 mb-0">Kelola data kendaraan transportasi</p>
             </div>
+            @can('vehicle.create')
             <a href="{{ route('admin.vehicles.create') }}"
                class="btn btn-sp-primary d-inline-flex align-items-center gap-2 text-xs">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="white" viewBox="0 0 24 24">
@@ -13,6 +14,7 @@
                 </svg>
                 <span class="fw-600">Tambah</span>
             </a>
+            @endcan
         </div>
 
         @if(session('success'))
@@ -104,6 +106,7 @@
                                 </td>
                                 <td class="py-2 px-3 text-end">
                                     <div class="d-flex align-items-center justify-content-end gap-1">
+                                        @can('vehicle.edit')
                                         <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
                                             class="btn-action-edit">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,6 +114,8 @@
                                             </svg>
                                             Edit
                                         </a>
+                                        @endcan
+                                        @can('vehicle.delete')
                                         <button type="button" class="btn-action-delete"
                                                 onclick="deleteVehicle('{{ route('admin.vehicles.destroy', $vehicle) }}')">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,6 +123,7 @@
                                             </svg>
                                             Hapus
                                         </button>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>
@@ -212,6 +218,7 @@
                         @endif
                     </div>
                     <div class="d-flex align-items-center gap-2 pt-2 border-top border-slate-100">
+                        @can('vehicle.edit')
                         <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
                             class="btn-action-edit flex-fill">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,6 +226,8 @@
                             </svg>
                             Edit
                         </a>
+                        @endcan
+                        @can('vehicle.delete')
                         <form action="{{ route('admin.vehicles.destroy', $vehicle) }}" method="POST" class="flex-fill"
                               onsubmit="return confirm('Yakin ingin menghapus kendaraan ini?')">
                             @csrf
@@ -231,6 +240,7 @@
                                 Hapus
                             </button>
                         </form>
+                        @endcan
                     </div>
                 </div>
             @empty

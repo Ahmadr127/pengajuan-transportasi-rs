@@ -80,17 +80,16 @@
                 </div>
 
                 {{-- Baris 5: Role + Level Prioritas --}}
-                <div x-data="{ createRole: '{{ old('role', 'user') }}' }" class="row g-3 mb-2">
+                <div class="row g-3 mb-2">
                     <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Role *</label>
-                        <select name="role" x-model="createRole" required
-                                class="form-select form-select-sm">
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                            <option value="driver">Driver</option>
+                        <select name="role_id" required class="form-select form-select-sm">
+                            @foreach($roles as $role)
+                                <option value="{{ $role->id }}" @selected((string) old('role_id') === (string) $role->id)>{{ $role->label }}</option>
+                            @endforeach
                         </select>
                     </div>
-                    <div class="col-6" x-show="createRole === 'user'">
+                    <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Level Prioritas</label>
                         <select name="priority_level" class="form-select form-select-sm">
                             <option value="0" {{ old('priority_level', 0) == 0 ? 'selected' : '' }}>Normal</option>
@@ -100,7 +99,9 @@
                 </div>
 
                 <div class="d-flex align-items-center gap-2 pt-2 border-top border-slate-100">
+                    @can('user.create')
                     <button type="submit" class="btn btn-sp-primary text-xs fw-600">Simpan</button>
+                    @endcan
                     <a href="{{ route('admin.users.index') }}"
                        class="btn btn-sp-outline text-xs fw-600">Batal</a>
                 </div>

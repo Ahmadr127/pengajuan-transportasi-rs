@@ -11,54 +11,73 @@ class SignatureController extends Controller
     public function show(TransportRequest $transportRequest)
     {
         $signatureType = $this->determineSignatureType($transportRequest);
-        if (!$signatureType) {
+        if (! $signatureType) {
             return redirect()->back()->with('error', 'Tidak ada tanda tangan yang diperlukan saat ini.');
         }
-        return view('signature.show', compact('transportRequest', 'signatureType'));
+
+        return view('signature.show', [
+            'transportRequest' => $transportRequest,
+            'signatureType' => $signatureType,
+            'backUrl' => $this->backUrl($transportRequest, $signatureType),
+        ]);
     }
 
     public function confirm(TransportRequest $transportRequest)
     {
         $signatureType = $this->determineSignatureType($transportRequest);
-        if (!$signatureType) {
-            return view('signature.already_signed', compact('transportRequest'));
+        if (! $signatureType) {
+            return view('signature.already_signed', [
+                'transportRequest' => $transportRequest,
+                'backUrl' => $this->backUrl($transportRequest),
+            ]);
         }
-        return view('signature.confirm', compact('transportRequest', 'signatureType'));
+
+        return view('signature.confirm', [
+            'transportRequest' => $transportRequest,
+            'signatureType' => $signatureType,
+            'backUrl' => $this->backUrl($transportRequest, $signatureType),
+        ]);
     }
 
     public function sign(Request $request, TransportRequest $transportRequest)
     {
         $signatureType = $this->determineSignatureType($transportRequest);
-        if (!$signatureType) {
+        if (! $signatureType) {
             return redirect()->back()->with('error', 'Tidak ada tanda tangan yang diperlukan saat ini.');
         }
+
+        $user = auth()->user();
         $signatureCode = Str::random(32);
+
         switch ($signatureType) {
             case 'pemohon':
                 $transportRequest->update(['signature_pemohon' => $signatureCode, 'signature_pemohon_at' => now()]);
                 $message = 'Tanda tangan pemohon berhasil disimpan.';
-                $redirect = auth()->user()->isAdmin() ? route('admin.transport.index') : route('pengajuan.index');
+                $redirect = $user->hasPermission('transport.request.view')
+                    ? route('admin.transport.index')
+                    : route('pengajuan.index');
                 break;
             case 'pengelola_1':
-                $transportRequest->update(['signature_pengelola_1' => $signatureCode, 'signature_pengelola_1_at' => now(), 'signature_pengelola_1_name' => auth()->user()->full_name]);
+                $transportRequest->update(['signature_pengelola_1' => $signatureCode, 'signature_pengelola_1_at' => now(), 'signature_pengelola_1_name' => $user->full_name]);
                 $message = 'Tanda tangan pengelola berhasil disimpan.';
                 $redirect = route('admin.transport.show', $transportRequest);
                 break;
             case 'driver':
                 $transportRequest->update(['signature_driver' => $signatureCode, 'signature_driver_at' => now()]);
                 $message = 'Tanda tangan pengemudi berhasil disimpan.';
-                $redirect = auth()->user()->isDriver()
+                $redirect = $user->hasPermission('driver.task.view')
                     ? route('driver.dashboard')
                     : route('admin.transport.show', $transportRequest);
                 break;
             case 'pengelola_2':
-                $transportRequest->update(['signature_pengelola_2' => $signatureCode, 'signature_pengelola_2_at' => now(), 'signature_pengelola_2_name' => auth()->user()->full_name]);
+                $transportRequest->update(['signature_pengelola_2' => $signatureCode, 'signature_pengelola_2_at' => now(), 'signature_pengelola_2_name' => $user->full_name]);
                 $message = 'Tanda tangan pengelola berhasil disimpan.';
                 $redirect = route('admin.transport.show', $transportRequest);
                 break;
             default:
                 return redirect()->back()->with('error', 'Tipe tanda tangan tidak valid.');
         }
+
         return redirect($redirect)->with('success', $message);
     }
 
@@ -70,7 +89,7 @@ class SignatureController extends Controller
             ->orWhere('signature_pengelola_2', $code)
             ->first();
 
-        if (!$transportRequest) {
+        if (! $transportRequest) {
             return view('signature.verify', ['found' => false, 'code' => $code]);
         }
 
@@ -112,20 +131,45 @@ class SignatureController extends Controller
         ]);
     }
 
-    private function determineSignatureType(TransportRequest $transportRequest)
+    private function backUrl(TransportRequest $transportRequest, ?string $signatureType = null): string
     {
         $user = auth()->user();
 
-        // Cek apakah user adalah supir yang ditugaskan
-        $isAssignedDriver = false;
-        if ($user->isDriver() && $user->driver) {
-            $isAssignedDriver = $transportRequest->driver_id === $user->driver->id;
+        if ($signatureType === 'driver' && $user->hasPermission('driver.task.view')) {
+            return route('driver.dashboard');
         }
 
-        if ($transportRequest->status === 'diajukan' && !$transportRequest->signature_pemohon && $transportRequest->user_id === $user->id) return 'pemohon';
-        if ($transportRequest->status === 'diproses' && !$transportRequest->signature_pengelola_1 && $user->isAdmin()) return 'pengelola_1';
-        if ($transportRequest->status === 'digunakan' && !$transportRequest->signature_driver && ($user->isAdmin() || $isAssignedDriver)) return 'driver';
-        if ($transportRequest->status === 'selesai' && !$transportRequest->signature_pengelola_2 && $user->isAdmin()) return 'pengelola_2';
+        if ($user->hasPermission('transport.request.view')) {
+            return route('admin.transport.show', $transportRequest);
+        }
+
+        if ($user->hasPermission('driver.task.view')) {
+            return route('driver.dashboard');
+        }
+
+        return route('pengajuan.index');
+    }
+
+    private function determineSignatureType(TransportRequest $transportRequest): ?string
+    {
+        $user = auth()->user();
+
+        $isAssignedDriver = $user->driver
+            && $transportRequest->driver_id === $user->driver->id;
+
+        if ($transportRequest->status === 'diajukan' && ! $transportRequest->signature_pemohon && $transportRequest->user_id === $user->id) {
+            return 'pemohon';
+        }
+        if ($transportRequest->status === 'diproses' && ! $transportRequest->signature_pengelola_1 && $user->hasPermission('transport.request.approve')) {
+            return 'pengelola_1';
+        }
+        if ($transportRequest->status === 'digunakan' && ! $transportRequest->signature_driver && ($isAssignedDriver || $user->hasPermission('transport.request.update'))) {
+            return 'driver';
+        }
+        if ($transportRequest->status === 'selesai' && ! $transportRequest->signature_pengelola_2 && $user->hasPermission('transport.request.complete')) {
+            return 'pengelola_2';
+        }
+
         return null;
     }
 }

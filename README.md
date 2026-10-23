@@ -33,6 +33,14 @@ Aplikasi web untuk mengelola pengajuan dan penugasan kendaraan transportasi di l
 - Auto-reject pengajuan kadaluarsa via scheduled command
 - Verifikasi tanda tangan via QR code
 
+### 🔐 Role & Permission (RBAC)
+- Akses menu dan tombol dikelola dari database, bukan hardcode role di kode.
+- **Role & Permission** (`/admin/roles`) untuk membuat role baru dan memilih permission.
+- **Menu** (`/admin/menus`) untuk mengatur label, route, icon, urutan, landing page, sidebar, dan bottom nav.
+- Role baru langsung berlaku tanpa deploy: buat role → centang permission → simpan → pilih role di Master User.
+- Menu hanya tampil jika user memiliki permission terkait; tombol aksi dibungkus `@can(...)`.
+- Akun `admin` hasil seeder memiliki role **Super Admin** agar dapat mengelola RBAC.
+
 ---
 
 ## Tech Stack

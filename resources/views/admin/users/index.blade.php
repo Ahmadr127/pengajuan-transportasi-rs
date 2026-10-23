@@ -7,6 +7,7 @@
                 <p class="text-slate-500 text-xs mt-1 mb-0">Kelola data user sistem</p>
             </div>
             <div class="d-flex align-items-center gap-2">
+                @can('user.sync')
                 <form method="POST" action="{{ route('admin.users.sync-simutu') }}" onsubmit="return confirm('Sinkronkan data pegawai dari Simutu? User yang belum ada akan dibuat otomatis.');">
                     @csrf
                     <button type="submit"
@@ -17,6 +18,8 @@
                         <span class="fw-600">Sync Simutu</span>
                     </button>
                 </form>
+                @endcan
+                @can('user.create')
                 <a href="{{ route('admin.users.create') }}"
                    class="btn btn-sp-primary d-inline-flex align-items-center gap-2 text-xs">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="white" viewBox="0 0 24 24">
@@ -24,6 +27,7 @@
                     </svg>
                     <span class="fw-600">Tambah</span>
                 </a>
+                @endcan
             </div>
         </div>
 
@@ -84,9 +88,9 @@
                             <th class="py-2 px-3">
                                 <select name="role" class="form-select form-select-sm text-xxs border-slate-300">
                                     <option value="">Semua</option>
-                                    <option value="user" @selected(request('role') === 'user')>User</option>
-                                    <option value="admin" @selected(request('role') === 'admin')>Admin</option>
-                                    <option value="driver" @selected(request('role') === 'driver')>Driver</option>
+                                    @foreach($roles as $role)
+                                        <option value="{{ $role->name }}" @selected(request('role') === $role->name)>{{ $role->label }}</option>
+                                    @endforeach
                                 </select>
                             </th>
                             <th class="py-2 px-3"></th>
@@ -118,22 +122,19 @@
                                 <td class="py-2 px-3 text-slate-700">{{ $user->profesi ?? '-' }}</td>
                                 <td class="py-2 px-3 text-slate-700">{{ $user->jabatan ?? '-' }}</td>
                                 <td class="py-2 px-3">
-                                    @if($user->role === 'admin')
-                                        <span class="badge-indigo">Admin</span>
-                                    @elseif($user->role === 'driver')
-                                        <span class="badge-amber">Driver</span>
-                                    @else
-                                        <span class="badge-slate">User</span>
-                                    @endif
+                                    <span class="badge-indigo">{{ $user->primaryRoleLabel() }}</span>
                                 </td>
                                 <td class="py-2 px-3 text-end">
                                     <div class="d-flex align-items-center justify-content-end gap-1">
+                                        @can('user.edit')
                                         <a href="{{ route('admin.users.edit', $user) }}" class="btn-action-edit">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                                             </svg>
                                             Edit
                                         </a>
+                                        @endcan
+                                        @can('user.delete')
                                         <button type="button" class="btn-action-delete"
                                                 onclick="confirmDelete('{{ route('admin.users.destroy', $user) }}')">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,6 +142,7 @@
                                             </svg>
                                             Hapus
                                         </button>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>
@@ -166,21 +168,18 @@
                             <h3 class="fw-600 text-slate-900 text-sm mb-0">{{ $user->first_name }} {{ $user->last_name }}</h3>
                             <p class="text-xs text-slate-600 mt-1 mb-0">{{ $user->unit_kerja ?? '-' }}</p>
                         </div>
-                        @if($user->role === 'admin')
-                            <span class="badge-indigo">Admin</span>
-                        @elseif($user->role === 'driver')
-                            <span class="badge-amber">Driver</span>
-                        @else
-                            <span class="badge-slate">User</span>
-                        @endif
+                        <span class="badge-indigo">{{ $user->primaryRoleLabel() }}</span>
                     </div>
                     <div class="d-flex align-items-center gap-2 pt-2 border-top border-slate-100">
+                        @can('user.edit')
                         <a href="{{ route('admin.users.edit', $user) }}" class="btn-action-edit flex-fill">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                             </svg>
                             Edit
                         </a>
+                        @endcan
+                        @can('user.delete')
                         <button type="button" class="btn-action-delete flex-fill"
                                 onclick="confirmDelete('{{ route('admin.users.destroy', $user) }}')">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,6 +187,7 @@
                             </svg>
                             Hapus
                         </button>
+                        @endcan
                     </div>
                 </div>
             @empty

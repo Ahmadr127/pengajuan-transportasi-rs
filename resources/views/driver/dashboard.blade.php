@@ -115,6 +115,7 @@
                             </div>
                             <p class="font-mono text-xxs text-slate-400 mt-1 mb-0">{{ $item->nomor_pengajuan }}</p>
                         </div>
+                        @can('driver.task.print')
                         <a href="{{ route('driver.print', $item) }}?from=driver_active" target="_blank"
                             class="d-inline-flex align-items-center gap-1 text-xxs fw-600 px-3 py-1 rounded shrink-0"
                             style="background-color:#00685E; color:white !important;">
@@ -125,6 +126,7 @@
                             </svg>
                             Print
                         </a>
+                        @endcan
                     </div>
 
                     {{-- Kendaraan --}}
@@ -192,6 +194,7 @@
 
                 {{-- Selesaikan --}}
                 <div class="px-4 pb-4">
+                    @can('driver.task.complete')
                     <button type="button" @click="open = !open; if(open) cancelOpen = false;"
                         class="btn w-100 text-xs fw-600 px-3 py-2 d-flex align-items-center justify-content-center gap-2 mb-2"
                         :class="open ? 'btn-outline-secondary' : 'btn-sp-primary'">
@@ -233,8 +236,10 @@
                             </button>
                         </form>
                     </div>
+                    @endcan
 
                     {{-- Batalkan --}}
+                    @can('driver.task.cancel')
                     <button type="button" @click="cancelOpen = !cancelOpen; if(cancelOpen) open = false;"
                         class="btn w-100 text-xs fw-600 px-3 py-2 d-flex align-items-center justify-content-center gap-2"
                         :class="cancelOpen ? 'btn-outline-secondary' : 'btn-outline-danger'">
@@ -259,6 +264,7 @@
                             </button>
                         </form>
                     </div>
+                    @endcan
                 </div>
             </div>
         @empty

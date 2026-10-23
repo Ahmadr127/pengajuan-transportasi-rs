@@ -74,7 +74,9 @@
                               class="form-control form-control-sm">{{ old('notes') }}</textarea>
                 </div>
                 <div class="d-flex align-items-center gap-2 pt-2 border-top border-slate-100">
+                    @can('vehicle.create')
                     <button type="submit" class="btn btn-sp-primary text-xs fw-600">Simpan</button>
+                    @endcan
                     <a href="{{ route('admin.vehicles.index') }}"
                        class="btn btn-sp-outline text-xs fw-600">Batal</a>
                 </div>

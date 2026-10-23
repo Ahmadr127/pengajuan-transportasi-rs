@@ -9,10 +9,12 @@
             </div>
             <div class="d-flex align-items-center gap-2">
                 @if($transportRequest->status === 'selesai')
+                    @can('transport.request.print')
                     <a href="{{ route('admin.transport.print', $transportRequest) }}" target="_blank"
                        class="btn btn-sp-primary btn-sm d-inline-flex align-items-center gap-1">
                         Print
                     </a>
+                    @endcan
                 @endif
                 <a href="{{ route('admin.laporan') }}"
                    class="btn btn-sm btn-outline-secondary fw-600">

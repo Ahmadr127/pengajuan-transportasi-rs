@@ -100,6 +100,7 @@
                                     </td>
                                     <td class="px-3 py-2 text-center">
                                         <div class="d-flex align-items-center justify-content-center gap-1">
+                                            @can('recurring.edit')
                                             <a href="{{ route('admin.recurring-templates.edit', $item) }}"
                                                class="btn-action-edit" title="Edit">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,6 +108,8 @@
                                                 </svg>
                                                 Edit
                                             </a>
+                                            @endcan
+                                            @can('recurring.delete')
                                             <form action="{{ route('admin.recurring-templates.destroy', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus template ini? Pengajuan yang sudah terbuat tidak akan terhapus.');">
                                                 @csrf
                                                 @method('DELETE')
@@ -118,6 +121,7 @@
                                                     Hapus
                                                 </button>
                                             </form>
+                                            @endcan
                                         </div>
                                     </td>
                                 </tr>

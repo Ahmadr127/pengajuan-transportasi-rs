@@ -6,6 +6,7 @@
                 <h1 class="fw-bold text-slate-800 mb-0" style="font-size:1.1rem;">Master Driver</h1>
                 <p class="text-slate-500 text-xs mt-1 mb-0">Kelola data driver/pengemudi</p>
             </div>
+            @can('driver.create')
             <a href="{{ route('admin.drivers.create') }}"
                class="btn btn-sp-primary d-inline-flex align-items-center gap-2 text-xs">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="white" viewBox="0 0 24 24">
@@ -13,6 +14,7 @@
                 </svg>
                 <span class="fw-600">Tambah</span>
             </a>
+            @endcan
         </div>
 
         @if(session('success'))
@@ -76,6 +78,7 @@
                                 </td>
                                 <td class="py-2 px-3 text-end">
                                     <div class="d-flex align-items-center justify-content-end gap-1">
+                                        @can('driver.edit')
                                         <a href="{{ route('admin.drivers.edit', $driver) }}"
                                             class="btn-action-edit">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,6 +86,8 @@
                                             </svg>
                                             Edit
                                         </a>
+                                        @endcan
+                                        @can('driver.delete')
                                         <button type="button" class="btn-action-delete"
                                                 onclick="deleteDriver('{{ route('admin.drivers.destroy', $driver) }}')">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,6 +95,7 @@
                                             </svg>
                                             Hapus
                                         </button>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>
@@ -168,6 +174,7 @@
                         @endif
                     </div>
                     <div class="d-flex align-items-center gap-2 pt-2 border-top border-slate-100">
+                        @can('driver.edit')
                         <a href="{{ route('admin.drivers.edit', $driver) }}"
                             class="btn-action-edit flex-fill">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,6 +182,8 @@
                             </svg>
                             Edit
                         </a>
+                        @endcan
+                        @can('driver.delete')
                         <form action="{{ route('admin.drivers.destroy', $driver) }}" method="POST" class="flex-fill"
                               onsubmit="return confirm('Yakin ingin menghapus driver ini?')">
                             @csrf
@@ -187,6 +196,7 @@
                                 Hapus
                             </button>
                         </form>
+                        @endcan
                     </div>
                 </div>
             @empty

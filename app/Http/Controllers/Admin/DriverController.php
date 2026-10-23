@@ -21,13 +21,13 @@ class DriverController extends Controller
         }
 
         $drivers = $query->paginate(15)->withQueryString();
-        $driverUsers = \App\Models\User::where('role', 'driver')->orderBy('first_name')->get();
+        $driverUsers = \App\Models\User::withPermission('driver.task.view')->orderBy('first_name')->get();
         return view('admin.drivers.index', compact('drivers', 'driverUsers'));
     }
 
     public function create()
     {
-        $driverUsers = \App\Models\User::where('role', 'driver')->orderBy('first_name')->get();
+        $driverUsers = \App\Models\User::withPermission('driver.task.view')->orderBy('first_name')->get();
         return view('admin.drivers.create', compact('driverUsers'));
     }
 
@@ -56,7 +56,7 @@ class DriverController extends Controller
 
     public function edit(Driver $driver)
     {
-        $driverUsers = \App\Models\User::where('role', 'driver')->orderBy('first_name')->get();
+        $driverUsers = \App\Models\User::withPermission('driver.task.view')->orderBy('first_name')->get();
         return view('admin.drivers.edit', compact('driver', 'driverUsers'));
     }
 

@@ -118,6 +118,7 @@
                 </div>
 
                 <div class="pt-2 d-flex justify-content-end">
+                    @can('recurring.edit')
                     <button type="submit"
                             class="btn btn-sm d-inline-flex align-items-center gap-1.5 text-xs fw-600 text-white px-3 py-1.5"
                             style="background: linear-gradient(to right, #007774, #009e9a);">
@@ -126,6 +127,7 @@
                         </svg>
                         Simpan
                     </button>
+                    @endcan
                 </div>
             </form>
         </div>

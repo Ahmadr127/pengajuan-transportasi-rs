@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
  *
  * Prinsip non-destruktif:
  *  - Tidak pernah menghapus user lokal (aman untuk FK transport_requests.user_id).
- *  - role ('user'/'admin'/'driver') lokal TIDAK ditimpa; hanya diisi saat user baru.
+ *  - role lokal TIDAK ditimpa; hanya diisi saat user baru.
  *  - Password disalin dari simutu (hash bcrypt kompatibel).
  *  - Driver tetap dikelola manual via tabel drivers.
  */
@@ -178,6 +178,13 @@ class SimutuUserSyncService
 
         if ($local) {
             $local->update($data);
+
+            // User lama yang belum punya role pivot tetap dipetakan, tapi
+            // role yang sudah diatur admin tidak ditimpa.
+            if ($local->roles()->count() === 0 && $role) {
+                $local->syncRolesByName([$role]);
+            }
+
             return $local;
         }
 
@@ -191,7 +198,13 @@ class SimutuUserSyncService
 
         $data['priority_level'] = $this->resolvePriority($simutu);
 
-        return User::create($data);
+        $user = User::create($data);
+
+        if ($role) {
+            $user->syncRolesByName([$role]);
+        }
+
+        return $user;
     }
 
     /**

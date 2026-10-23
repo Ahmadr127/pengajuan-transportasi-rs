@@ -314,6 +314,7 @@
                 {{-- Aksi --}}
                 <div class="d-flex flex-row justify-content-end gap-2">
                     @if($item->status !== 'tidak_disetujui')
+                        @can('transport.request.print')
                         <a href="{{ route('pengajuan.print', $item) }}" target="_blank"
                             class="d-inline-flex justify-content-center align-items-center gap-2 px-4 py-2 rounded text-xs fw-600 shadow-sm"
                             style="background-color:#059669; color:white !important;">
@@ -324,6 +325,7 @@
                             </svg>
                             Cetak Surat
                         </a>
+                        @endcan
                     @endif
                     <a href="{{ route('dashboard') }}"
                         class="d-inline-flex justify-content-center align-items-center px-4 py-2 rounded text-xs fw-600 shadow-sm"

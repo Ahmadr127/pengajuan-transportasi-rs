@@ -10,16 +10,18 @@ class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        User::updateOrCreate(
-            ['username' => 'test.admin'],
+        $admin = User::updateOrCreate(
+            ['username' => 'admin'],
             [
                 'first_name'    => 'Admin',
                 'last_name'     => '',
-                'username'      => 'admin',
                 'password'      => Hash::make('rsazra'),
-                'role'          => 'admin',
+                'role'          => 'super-admin',
                 'priority_level' => 0,
             ]
         );
+
+        // Akun admin utama harus bisa mengelola role & menu (RBAC).
+        $admin->syncRolesByName(['super-admin']);
     }
 }
