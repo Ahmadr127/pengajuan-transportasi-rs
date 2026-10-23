@@ -134,13 +134,14 @@ class RbacTest extends TestCase
         );
     }
 
-    public function test_user_without_any_permission_lands_on_no_access(): void
+    public function test_user_without_any_permission_gets_forbidden(): void
     {
         $user = User::factory()->create(['username' => 'tanpa.akses']);
 
-        $this->assertSame(
-            'no.access',
-            app(LandingResolver::class)->routeNameFor($user)
-        );
+        $this->assertNull(app(LandingResolver::class)->routeNameFor($user));
+
+        $this->actingAs($user)
+            ->get(route('home'))
+            ->assertForbidden();
     }
 }

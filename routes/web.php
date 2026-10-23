@@ -78,10 +78,6 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:profile.view')
         ->name('profil');
 
-    // Halaman fallback bila user tidak punya menu/permission sama sekali.
-    // Route::view('/tidak-ada-akses', 'errors.no-access')
-    //     ->name('no.access');
-
     // Signature Routes
     Route::middleware('permission:signature.sign')->group(function () {
         Route::get('/signature/{transportRequest}', [SignatureController::class, 'show'])->name('signature.show');

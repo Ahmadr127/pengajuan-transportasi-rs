@@ -10,13 +10,19 @@ class LandingResolver
     {
     }
 
-    public function routeNameFor(User $user): string
+    public function routeNameFor(User $user): ?string
     {
-        return $this->menus->landingRoute($user) ?? 'no.access';
+        return $this->menus->landingRoute($user);
     }
 
     public function redirectFor(User $user)
     {
-        return redirect()->route($this->routeNameFor($user));
+        $route = $this->routeNameFor($user);
+
+        if (! $route) {
+            abort(403);
+        }
+
+        return redirect()->route($route);
     }
 }

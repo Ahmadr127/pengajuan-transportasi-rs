@@ -5,7 +5,7 @@
     $context = $menuService->contextFor($user);
     $sidebarMenu = $menuService->sidebar($user, $context);
     $bottomMenu = $menuService->bottomNav($user, $context);
-    $landingRoute = $menuService->landingRoute($user) ?? 'no.access';
+    $landingRoute = $menuService->landingRoute($user);
     $adminContext = $context === 'admin';
     $historyRoute = $menuService->routeFor($user, 'driver.history')
         ?? $menuService->routeFor($user, 'user.transport.history');
@@ -148,7 +148,7 @@
                     </button>
                 @endif
 
-                <a href="{{ route($landingRoute) }}"
+                <a href="{{ $landingRoute ? route($landingRoute) : url('/') }}"
                     class="d-flex align-items-center gap-2 min-w-0 text-decoration-none {{ $adminContext ? 'd-lg-none' : '' }}">
                     <div class="rounded p-1">
                         <img src="{{ asset('images/logo.png') }}" alt="RS Azra" style="height:2.5rem;width:auto;">
