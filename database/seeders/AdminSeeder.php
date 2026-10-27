@@ -16,7 +16,6 @@ class AdminSeeder extends Seeder
                 'first_name'    => 'Admin',
                 'last_name'     => '',
                 'password'      => Hash::make('rsazra'),
-                'role'          => 'super-admin',
                 'priority_level' => 0,
             ]
         );

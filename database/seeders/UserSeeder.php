@@ -13,16 +13,17 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate(
-            ['username' => 'user.ahmad'],
+        $user = User::updateOrCreate(
+            ['username' => 'user'],
             [
                 'first_name' => 'User',
                 'last_name' => 'User',
                 'username' => 'user',
                 'password' => Hash::make('rsazra'),
-                'role' => 'user',
                 'priority_level' => 0,
             ]
         );
+
+        $user->syncRolesByName(['user']);
     }
 }

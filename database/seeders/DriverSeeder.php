@@ -21,10 +21,11 @@ class DriverSeeder extends Seeder
                 'last_name' => 'Prasetyo',
                 'username' => 'driver.bambang',
                 'password' => Hash::make('rsazra'),
-                'role' => 'driver',
                 'priority_level' => 0,
             ]
         );
+
+        $user->syncRolesByName(['driver']);
 
         Driver::updateOrCreate(
             ['user_id' => $user->id],

@@ -23,7 +23,6 @@ class SmokeTest extends TestCase
         $role = \App\Models\Role::where('name', $roleName)->first();
         if ($role) {
             $user->roles()->sync([$role->id]);
-            $user->forceFill(['role' => $role->name])->saveQuietly();
         }
         return $user;
     }

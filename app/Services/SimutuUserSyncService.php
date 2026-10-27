@@ -115,8 +115,8 @@ class SimutuUserSyncService
 
     protected function resolveRole(array $simutu, ?User $local): string
     {
-        if ($local && $local->role) {
-            return $local->role; // jangan timpa role lokal yang sudah diatur admin
+        if ($local && $local->roles()->exists()) {
+            return (string) $local->roles()->orderBy('roles.id')->value('name'); // jangan timpa role lokal yang sudah diatur admin
         }
 
         return (string) config('simutu_sync.default_role', 'user');
@@ -170,9 +170,7 @@ class SimutuUserSyncService
         }
 
         $role = $this->resolveRole($simutu, $local);
-        if ($role) {
-            $data['role'] = $role;
-        }
+
         if (! $local) {
             $data['priority_level'] = $this->resolvePriority($simutu);
         }

@@ -20,7 +20,7 @@ class UserResource extends JsonResource
             'posisi_pekerjaan' => $this->posisi_pekerjaan,
             'profesi' => $this->profesi,
             'jabatan' => $this->jabatan,
-            'role' => $this->role,
+            'role' => $this->primaryRole()?->name,
             'priority_level' => $this->priority_level,
             'simutu_id' => $this->simutu_id,
             'simutu_status' => $this->simutu_status,

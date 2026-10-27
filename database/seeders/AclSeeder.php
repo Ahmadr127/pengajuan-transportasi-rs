@@ -182,7 +182,11 @@ class AclSeeder extends Seeder
         User::query()->with('roles')->chunkById(100, function ($users) {
             foreach ($users as $user) {
                 if ($user->roles->isEmpty()) {
-                    $role = Role::where('name', $user->role)->first() ?? Role::where('name', 'user')->first();
+                    $roleName = 'user';
+                    if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'role')) {
+                        $roleName = $user->role ?: 'user';
+                    }
+                    $role = Role::where('name', $roleName)->first() ?? Role::where('name', 'user')->first();
                     if ($role) {
                         $user->roles()->syncWithoutDetaching([$role->id]);
                     }

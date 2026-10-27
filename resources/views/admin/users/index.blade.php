@@ -42,20 +42,13 @@
                 {{ session('error') }}
             </div>
         @endif
-
-        {{-- Hidden form untuk delete (di luar tabel agar tidak nested) --}}
-        <form id="delete-user-form" method="POST" style="display:none;">
-            @csrf
-            @method('DELETE')
-        </form>
-
         <!-- Desktop Table -->
+        <form method="GET" action="{{ route('admin.users.index') }}" id="users-filter-form">
         <div class="d-none d-md-block sp-card overflow-hidden mb-3">
             <div class="overflow-x-auto">
                 <table class="sp-table w-100 text-xs">
                     <thead>
                         {{-- Baris 1: Filter --}}
-                        <form method="GET" action="{{ route('admin.users.index') }}" id="users-filter-form">
                         <tr class="bg-slate-50 border-bottom border-slate-200">
                             <th class="py-2 px-3">
                                 <input type="text" name="nama" value="{{ request('nama') }}" placeholder="Cari nama..."
@@ -95,7 +88,6 @@
                             </th>
                             <th class="py-2 px-3"></th>
                         </tr>
-                        </form>
                         {{-- Baris 2: Header --}}
                         <tr class="text-start text-xxs fw-600 text-white text-uppercase" style="background: linear-gradient(to right, #007774, #009e9a);">
                             <th class="py-2 px-3">Nama Lengkap</th>
@@ -158,6 +150,13 @@
                 {{ $users->links() }}
             </div>
         </div>
+        </form>
+
+        {{-- Hidden form untuk delete (di luar tabel agar tidak nested) --}}
+        <form id="delete-user-form" method="POST" style="display:none;">
+            @csrf
+            @method('DELETE')
+        </form>
 
         <!-- Mobile Cards -->
         <div class="d-md-none">

@@ -30,7 +30,6 @@ class User extends Authenticatable
         'profesi',
         'jabatan',
         'password',
-        'role',
         'priority_level',
         'simutu_id',
         'simutu_status',
@@ -149,7 +148,7 @@ class User extends Authenticatable
 
     public function primaryRoleLabel(): string
     {
-        return $this->primaryRole()?->label ?? ucfirst((string) $this->role);
+        return $this->primaryRole()?->label ?? ucfirst((string) ($this->primaryRole()?->name ?? ''));
     }
 
     /**
@@ -162,11 +161,6 @@ class User extends Authenticatable
         $roles = Role::query()->whereIn('name', $roleNames)->get();
 
         $this->roles()->sync($roles->pluck('id')->all());
-
-        $primary = $roles->sortBy('id')->first();
-        if ($primary) {
-            $this->forceFill(['role' => $primary->name])->saveQuietly();
-        }
 
         $this->permissionNamesCache = null;
         $this->superAdminCache = null;

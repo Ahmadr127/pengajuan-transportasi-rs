@@ -52,7 +52,6 @@ class UserAccountService
             'posisi_pekerjaan' => $data['posisi_pekerjaan'] ?? null,
             'profesi' => $data['profesi'] ?? null,
             'jabatan' => $data['jabatan'] ?? null,
-            'role' => $role->name,
             'priority_level' => $data['priority_level'] ?? 0,
         ]);
 
@@ -79,7 +78,6 @@ class UserAccountService
             'posisi_pekerjaan' => $data['posisi_pekerjaan'] ?? null,
             'profesi' => $data['profesi'] ?? null,
             'jabatan' => $data['jabatan'] ?? null,
-            'role' => $role->name,
             'priority_level' => $data['priority_level'] ?? 0,
         ];
 
