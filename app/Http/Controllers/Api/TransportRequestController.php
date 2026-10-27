@@ -32,15 +32,19 @@ class TransportRequestController extends BaseApiController
             $items = $this->query->adminIndex($filters);
             // override per_page handled inside? adminIndex uses paginate(10). We'll re-paginate by calling query builder manually is complex; accept default.
         } else {
-            // user's own
-            $q = TransportRequest::with('user', 'driver')
-                ->where('user_id', $user->id)
-                ->orderBy('created_at', 'desc');
+            // Driver melihat tugas yang ditugaskan kepadanya; user biasa melihat pengajuan sendiri.
+            $q = TransportRequest::with('user', 'driver')->orderBy('created_at', 'desc');
+            if ($user->driver) {
+                $q->where('driver_id', $user->driver->id);
+            } else {
+                $q->where('user_id', $user->id);
+            }
             if ($request->filled('jenis')) {
                 $q->where('jenis', $request->jenis);
             }
             if ($request->filled('status')) {
-                $q->where('status', $request->status);
+                $statuses = array_filter(array_map('trim', explode(',', (string) $request->status)));
+                $q->whereIn('status', $statuses);
             }
             if ($request->filled('tanggal')) {
                 $q->whereDate('tanggal', $request->tanggal);

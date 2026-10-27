@@ -26,7 +26,7 @@ class DashboardController extends BaseApiController
             ];
 
             $latest = TransportRequest::with('user')->latest()->limit(5)->get();
-            $activeVehicles = TransportRequest::with('user')->where('status', 'digunakan')->orderByRaw("CONCAT(tanggal, ' ', jam) ASC")->get();
+            $activeVehicles = TransportRequest::with('user')->where('status', 'digunakan')->orderBy('tanggal')->orderBy('jam')->get();
             $approvedToday = TransportRequest::where('status', 'diproses')->whereDate('tanggal', today())->count();
 
             return $this->success([
@@ -34,6 +34,26 @@ class DashboardController extends BaseApiController
                 'latest' => \App\Http\Resources\TransportRequestResource::collection($latest),
                 'active_vehicles' => \App\Http\Resources\TransportRequestResource::collection($activeVehicles),
                 'approved_today' => $approvedToday,
+            ]);
+        }
+
+        // driver stats — konsisten dengan Driver\DashboardController (berbasis driver_id)
+        if ($user->hasPermission('driver.task.view') && $user->driver) {
+            $driverId = $user->driver->id;
+
+            $active = TransportRequest::with('user')
+                ->where('driver_id', $driverId)
+                ->where('status', 'digunakan')
+                ->orderBy('tanggal')
+                ->orderBy('jam')
+                ->get();
+
+            return $this->success([
+                'role' => 'driver',
+                'total_tugas' => TransportRequest::where('driver_id', $driverId)->count(),
+                'tugas_aktif' => $active->count(),
+                'tugas_selesai' => TransportRequest::where('driver_id', $driverId)->where('status', 'selesai')->count(),
+                'active' => \App\Http\Resources\TransportRequestResource::collection($active),
             ]);
         }
 
