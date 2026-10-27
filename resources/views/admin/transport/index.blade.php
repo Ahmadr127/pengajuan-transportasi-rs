@@ -25,7 +25,7 @@
 
                     <select name="status" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
                         <option value="">Semua Status</option>
-                        <option value="diajukan" @selected(!request()->has('status') || request('status') === 'diajukan')>Menunggu (Diajukan)</option>
+                        <option value="diajukan" @selected(request('status') === 'diajukan')>Menunggu (Diajukan)</option>
                         <option value="diproses" @selected(request('status') === 'diproses')>Disetujui</option>
                         <option value="digunakan" @selected(request('status') === 'digunakan')>Digunakan</option>
                         <option value="selesai" @selected(request('status') === 'selesai')>Selesai</option>

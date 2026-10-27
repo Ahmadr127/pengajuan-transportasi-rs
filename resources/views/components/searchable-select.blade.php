@@ -4,6 +4,7 @@
     'selected' => '',
     'placeholder' => '-- Pilih --',
     'required' => false,
+    'id' => null,
 ])
 
 <div x-data="{
@@ -20,10 +21,29 @@
     init() {
         const found = this.options.find(o => String(o.value) === String(this.value));
         this.label = found ? found.label : '';
+        this.$nextTick(() => {
+            const el = this.$refs.hidden;
+            if (el && this.value !== '') {
+                el.dispatchEvent(new CustomEvent('change', { bubbles: true, detail: { value: this.value, option: found } }));
+            }
+        });
     },
-    select(o) { this.value = o.value; this.label = o.label; this.open = false; this.search = ''; }
+    select(o) {
+        this.value = o.value;
+        this.label = o.label;
+        this.open = false;
+        this.search = '';
+        this.$nextTick(() => {
+            const el = this.$refs.hidden;
+            if (el) {
+                el.dispatchEvent(new CustomEvent('change', { bubbles: true, detail: { value: o.value, option: o } }));
+            }
+        });
+    }
 }" class="position-relative" @click.outside="open = false">
-    <input type="hidden" name="{{ $name }}" :value="value" @if($required) required @endif>
+    <input type="hidden" name="{{ $name }}" id="{{ $id ?? $name }}" :value="value" @if($required) required @endif
+           x-ref="hidden"
+           @change.stop>
     <button type="button"
             class="form-select form-select-sm text-start d-flex align-items-center justify-content-between"
             @click="open = !open">

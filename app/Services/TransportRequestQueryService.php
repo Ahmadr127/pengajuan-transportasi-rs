@@ -37,11 +37,8 @@ class TransportRequestQueryService
             // "Semua Status" dipilih.
             $query->orderBy('created_at', 'desc');
         } else {
-            $query->leftJoin('users', 'transport_requests.user_id', '=', 'users.id')
-                ->where('transport_requests.status', 'diajukan')
-                ->orderByRaw('COALESCE(users.priority_level, 0) DESC')
-                ->orderByRaw("CONCAT(transport_requests.tanggal, ' ', transport_requests.jam) ASC")
-                ->select('transport_requests.*');
+            // Default: tampilkan semua status.
+            $query->orderBy('created_at', 'desc');
         }
 
         if (! blank($filters['jenis'] ?? null)) {

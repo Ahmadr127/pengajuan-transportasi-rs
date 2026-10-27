@@ -23,7 +23,7 @@ class AdminMasterDataCrudTest extends TestCase
     private function admin(): User
     {
         $user = User::factory()->create(['username' => 'admin1']);
-        $user->syncRolesByName(['admin']);
+        $user->syncRolesByName(['super-admin']);
 
         return $user;
     }

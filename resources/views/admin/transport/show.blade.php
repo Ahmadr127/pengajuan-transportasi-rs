@@ -477,16 +477,18 @@
                                     <label
                                         class="d-block text-xxs fw-600 text-slate-600 mb-1 text-uppercase tracking-wide">Unit
                                         Kendaraan <span class="text-danger">*</span></label>
-                                    <select name="unit_mobil" id="unit_mobil" class="form-select form-select-sm">
-                                        <option value="">-- Pilih Unit --</option>
-                                        @foreach($vehicles as $vehicle)
-                                            <option value="{{ $vehicle->name }}" data-plate="{{ $vehicle->plate_number }}"
-                                                data-last-km="{{ $vehicle->last_km ?? 0 }}"
-                                                @selected(old('unit_mobil') == $vehicle->name)>
-                                                {{ $vehicle->name }} ({{ $vehicle->plate_number }})
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    @php($unitOptions = collect($vehicles)->map(fn($v) => [
+                                        'value' => $v->name,
+                                        'label' => $v->name.' ('.$v->plate_number.')',
+                                        'plate' => $v->plate_number,
+                                        'lastKm' => $v->last_km ?? 0,
+                                    ])->values()->all())
+                                    <x-searchable-select
+                                        name="unit_mobil"
+                                        id="unit_mobil"
+                                        :options="$unitOptions"
+                                        :selected="old('unit_mobil', $transportRequest->unit_mobil)"
+                                        placeholder="-- Pilih Unit --" />
                                     <input type="hidden" name="plat_nomor" id="plat_nomor"
                                         value="{{ old('plat_nomor', $transportRequest->plat_nomor) }}">
                                 </div>
@@ -494,14 +496,16 @@
                                     <label
                                         class="d-block text-xxs fw-600 text-slate-600 mb-1 text-uppercase tracking-wide">Pengemudi
                                         <span class="text-danger">*</span></label>
-                                    <select name="driver_id" class="form-select form-select-sm">
-                                        <option value="">-- Pilih Driver --</option>
-                                        @foreach($drivers as $driver)
-                                            <option value="{{ $driver->id }}" @selected(old('driver_id', $transportRequest->driver_id) == $driver->id)>
-                                                {{ $driver->name }}@if($driver->phone) &middot; {{ $driver->phone }}@endif
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    @php($driverOptions = collect($drivers)->map(fn($d) => [
+                                        'value' => $d->id,
+                                        'label' => $d->name.($d->phone ? ' · '.$d->phone : ''),
+                                    ])->values()->all())
+                                    <x-searchable-select
+                                        name="driver_id"
+                                        id="driver_id"
+                                        :options="$driverOptions"
+                                        :selected="old('driver_id', $transportRequest->driver_id)"
+                                        placeholder="-- Pilih Driver --" />
                                 </div>
                                 <div class="mb-2">
                                     <label
@@ -637,38 +641,47 @@
                                         <label
                                             class="d-block text-xxs fw-600 text-slate-600 mb-1 text-uppercase tracking-wide">Unit
                                             Kendaraan</label>
-                                        <select name="unit_mobil" id="unit_mobil_edit" class="form-select form-select-sm">
-                                            <option value="">-- Pilih Unit --</option>
-                                            @foreach($vehicles as $vehicle)
-                                                <option value="{{ $vehicle->name }}" data-plate="{{ $vehicle->plate_number }}"
-                                                    @selected($transportRequest->unit_mobil == $vehicle->name)>
-                                                    {{ $vehicle->name }} ({{ $vehicle->plate_number }})
-                                                </option>
-                                            @endforeach
-                                            @if($transportRequest->unit_mobil && !$vehicles->contains('name', $transportRequest->unit_mobil))
-                                                <option value="{{ $transportRequest->unit_mobil }}" selected>
-                                                    {{ $transportRequest->unit_mobil }} &mdash; saat ini</option>
-                                            @endif
-                                        </select>
+                                        @php($unitEditOptions = collect($vehicles)->map(fn($v) => [
+                                            'value' => $v->name,
+                                            'label' => $v->name.' ('.$v->plate_number.')',
+                                            'plate' => $v->plate_number,
+                                            'lastKm' => $v->last_km ?? 0,
+                                        ])->values()->all())
+                                        @if($transportRequest->unit_mobil && !$vehicles->contains('name', $transportRequest->unit_mobil))
+                                            @php($unitEditOptions[] = [
+                                                'value' => $transportRequest->unit_mobil,
+                                                'label' => $transportRequest->unit_mobil.' — saat ini',
+                                                'plate' => $transportRequest->plat_nomor,
+                                                'lastKm' => 0,
+                                            ])
+                                        @endif
+                                        <x-searchable-select
+                                            name="unit_mobil"
+                                            id="unit_mobil_edit"
+                                            :options="$unitEditOptions"
+                                            :selected="$transportRequest->unit_mobil"
+                                            placeholder="-- Pilih Unit --" />
                                         <input type="hidden" name="plat_nomor" id="plat_nomor_edit"
                                             value="{{ $transportRequest->plat_nomor }}">
                                     </div>
                                     <div class="mb-2">
                                         <label
                                             class="d-block text-xxs fw-600 text-slate-600 mb-1 text-uppercase tracking-wide">Pengemudi</label>
-                                        <select name="driver_id" class="form-select form-select-sm">
-                                            <option value="">-- Pilih Driver --</option>
-                                            @foreach($drivers as $driver)
-                                                <option value="{{ $driver->id }}"
-                                                    @selected($transportRequest->driver_id == $driver->id)>
-                                                    {{ $driver->name }}@if($driver->phone) &middot; {{ $driver->phone }}@endif
-                                                </option>
-                                            @endforeach
-                                            @if($transportRequest->driver_id && !$drivers->contains('id', $transportRequest->driver_id))
-                                                <option value="{{ $transportRequest->driver_id }}" selected>
-                                                    {{ $transportRequest->driver->name ?? '-' }} &mdash; saat ini</option>
-                                            @endif
-                                        </select>
+                                        @php($driverEditOptions = collect($drivers)->map(fn($d) => [
+                                            'value' => $d->id,
+                                            'label' => $d->name.($d->phone ? ' · '.$d->phone : ''),
+                                        ])->values()->all())
+                                        @if($transportRequest->driver_id && !$drivers->contains('id', $transportRequest->driver_id))
+                                            @php($driverEditOptions[] = [
+                                                'value' => $transportRequest->driver_id,
+                                                'label' => ($transportRequest->driver->name ?? '-').' — saat ini',
+                                            ])
+                                        @endif
+                                        <x-searchable-select
+                                            name="driver_id"
+                                            :options="$driverEditOptions"
+                                            :selected="$transportRequest->driver_id"
+                                            placeholder="-- Pilih Driver --" />
                                     </div>
                                     <div class="mb-2">
                                         <label
@@ -695,12 +708,22 @@
     </div>{{-- end container-fluid --}}
 
     <script>
+        const UNIT_DATA = {
+            @foreach($vehicles as $vehicle)
+            {{ Js::from($vehicle->name) }}: { plate: {{ Js::from($vehicle->plate_number) }}, lastKm: {{ $vehicle->last_km ?? 0 }} },
+            @endforeach
+            @if($transportRequest->unit_mobil && !$vehicles->contains('name', $transportRequest->unit_mobil))
+            {{ Js::from($transportRequest->unit_mobil) }}: { plate: {{ Js::from($transportRequest->plat_nomor) }}, lastKm: 0 },
+            @endif
+        };
+
         document.addEventListener('DOMContentLoaded', function () {
             const unitSel = document.getElementById('unit_mobil');
             const platIn = document.getElementById('plat_nomor');
             if (unitSel && platIn) {
                 unitSel.addEventListener('change', function () {
-                    platIn.value = this.options[this.selectedIndex].getAttribute('data-plate') || '';
+                    const d = UNIT_DATA[this.value];
+                    platIn.value = d ? d.plate : '';
                 });
             }
 
@@ -747,7 +770,8 @@
             let minKm = 0;
             function updateKmHint() {
                 if (!unitSel) return;
-                const lastKm = parseInt(unitSel.options[unitSel.selectedIndex]?.dataset?.lastKm) || 0;
+                const d = UNIT_DATA[unitSel.value];
+                const lastKm = d ? (parseInt(d.lastKm) || 0) : 0;
                 minKm = lastKm;
                 if (kmAwalEl) { kmAwalEl.min = lastKm; kmAwalEl.placeholder = lastKm > 0 ? 'Min. ' + lastKm.toLocaleString('id-ID') + ' km' : 'Masukkan KM'; }
                 if (kmHint) { kmHint.textContent = lastKm > 0 ? 'KM terakhir: ' + lastKm.toLocaleString('id-ID') + ' km' : ''; kmHint.classList.toggle('d-none', !lastKm); }
@@ -771,7 +795,8 @@
             const platEdit = document.getElementById('plat_nomor_edit');
             if (unitEdit && platEdit) {
                 unitEdit.addEventListener('change', function () {
-                    platEdit.value = this.options[this.selectedIndex].getAttribute('data-plate') || '';
+                    const d = UNIT_DATA[this.value];
+                    platEdit.value = d ? d.plate : '';
                 });
             }
 
