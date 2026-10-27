@@ -38,7 +38,7 @@
                     <label class="form-label text-xxs fw-600 text-slate-600">Akun Login Driver</label>
                     <x-searchable-select
                         name="user_id"
-                        :options="collect($driverUsers)->map(fn($u) => ['value' => $u->id, 'label' => $u->full_name])->values()->all()"
+                        :options="collect($driverUsers)->map(fn($u) => ['value' => $u->id, 'label' => $u->full_name.' ('.$u->username.')'])->values()->all()"
                         :selected="old('user_id', $driver->user_id)"
                         placeholder="-- Tidak dihubungkan --" />
                     <p class="mt-1 text-xxs text-slate-400">Hubungkan ke akun dengan role "driver" agar driver bisa login</p>
