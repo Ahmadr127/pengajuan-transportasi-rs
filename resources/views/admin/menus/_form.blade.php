@@ -59,12 +59,11 @@
 
         <div class="col-md-6">
             <label class="form-label text-xxs fw-600 text-slate-600">Permission</label>
-            <select name="permission_name" class="form-select form-select-sm">
-                <option value="">— tanpa permission —</option>
-                @foreach($permissions as $permission)
-                    <option value="{{ $permission }}" @selected(old('permission_name', $menu->permission_name ?? '') === $permission)>{{ $permission }}</option>
-                @endforeach
-            </select>
+            <x-searchable-select
+                name="permission_name"
+                :options="collect($permissions)->map(fn($p) => ['value' => $p, 'label' => $p])->values()->all()"
+                :selected="old('permission_name', $menu->permission_name ?? '')"
+                placeholder="— tanpa permission —" />
         </div>
         <div class="col-md-6">
             <label class="form-label text-xxs fw-600 text-slate-600">Icon</label>

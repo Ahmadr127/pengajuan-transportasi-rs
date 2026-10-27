@@ -54,15 +54,15 @@
                     <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Unit Kerja</label>
                         @php($currentUnit = old('unit_kerja', $user->unit_kerja))
-                        <select name="unit_kerja" class="form-select form-select-sm">
-                            <option value="">-- Pilih Unit --</option>
-                            @foreach($units as $unit)
-                                <option value="{{ $unit->nama_unit }}" @selected($currentUnit === $unit->nama_unit)>{{ $unit->nama_unit }}</option>
-                            @endforeach
-                            @if($currentUnit && ! $units->contains('nama_unit', $currentUnit))
-                                <option value="{{ $currentUnit }}" selected>{{ $currentUnit }} (nilai lama)</option>
-                            @endif
-                        </select>
+                        @php($unitOptions = collect($units)->map(fn($u) => ['value' => $u->nama_unit, 'label' => $u->nama_unit])->values())
+                        @if($currentUnit && ! $units->contains('nama_unit', $currentUnit))
+                            @php($unitOptions->push(['value' => $currentUnit, 'label' => $currentUnit.' (nilai lama)']))
+                        @endif
+                        <x-searchable-select
+                            name="unit_kerja"
+                            :options="$unitOptions->all()"
+                            :selected="$currentUnit"
+                            placeholder="-- Pilih Unit --" />
                     </div>
                     <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Posisi Pekerjaan</label>
@@ -84,15 +84,15 @@
                     <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Jabatan</label>
                         @php($currentJabatan = old('jabatan', $user->jabatan))
-                        <select name="jabatan" class="form-select form-select-sm">
-                            <option value="">-- Pilih Jabatan --</option>
-                            @foreach($jobRoles as $jobRole)
-                                <option value="{{ $jobRole->nama_role }}" @selected($currentJabatan === $jobRole->nama_role)>{{ $jobRole->nama_role }}</option>
-                            @endforeach
-                            @if($currentJabatan && ! $jobRoles->contains('nama_role', $currentJabatan))
-                                <option value="{{ $currentJabatan }}" selected>{{ $currentJabatan }} (nilai lama)</option>
-                            @endif
-                        </select>
+                        @php($jabatanOptions = collect($jobRoles)->map(fn($j) => ['value' => $j->nama_role, 'label' => $j->nama_role])->values())
+                        @if($currentJabatan && ! $jobRoles->contains('nama_role', $currentJabatan))
+                            @php($jabatanOptions->push(['value' => $currentJabatan, 'label' => $currentJabatan.' (nilai lama)']))
+                        @endif
+                        <x-searchable-select
+                            name="jabatan"
+                            :options="$jabatanOptions->all()"
+                            :selected="$currentJabatan"
+                            placeholder="-- Pilih Jabatan --" />
                     </div>
                 </div>
 
@@ -100,11 +100,12 @@
                 <div class="row g-3 mb-2">
                     <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Role *</label>
-                        <select name="role_id" required class="form-select form-select-sm">
-                            @foreach($roles as $role)
-                                <option value="{{ $role->id }}" @selected((string) old('role_id', $user->primaryRole()?->id) === (string) $role->id)>{{ $role->label }}</option>
-                            @endforeach
-                        </select>
+                        <x-searchable-select
+                            name="role_id"
+                            :options="collect($roles)->map(fn($r) => ['value' => $r->id, 'label' => $r->label])->values()->all()"
+                            :selected="old('role_id', $user->primaryRole()?->id)"
+                            placeholder="-- Pilih Role --"
+                            required />
                     </div>
                     <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Level Prioritas</label>

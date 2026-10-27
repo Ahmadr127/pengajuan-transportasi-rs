@@ -36,12 +36,11 @@
                 </div>
                 <div class="mb-2">
                     <label class="form-label text-xxs fw-600 text-slate-600">Akun Login Driver</label>
-                    <select name="user_id" class="form-select form-select-sm">
-                        <option value="">-- Tidak dihubungkan --</option>
-                        @foreach($driverUsers as $u)
-                            <option value="{{ $u->id }}" {{ old('user_id', $driver->user_id) == $u->id ? 'selected' : '' }}>{{ $u->full_name }}</option>
-                        @endforeach
-                    </select>
+                    <x-searchable-select
+                        name="user_id"
+                        :options="collect($driverUsers)->map(fn($u) => ['value' => $u->id, 'label' => $u->full_name])->values()->all()"
+                        :selected="old('user_id', $driver->user_id)"
+                        placeholder="-- Tidak dihubungkan --" />
                     <p class="mt-1 text-xxs text-slate-400">Hubungkan ke akun dengan role "driver" agar driver bisa login</p>
                 </div>
                 <div class="mb-2">
