@@ -10,8 +10,12 @@ Kode yang sudah terpasang di tiap aplikasi:
 
 - Koneksi DB kedua `simutu` (read-only) di `config/database.php`
 - Migrasi kolom `simutu_id`, `simutu_status`, `simutu_synced_at` di tabel `users`
-- `config/simutu_sync.php` (pemetaan role per aplikasi)
-- Service + command `php artisan simutu:sync-users [--dry-run]`
+- `config/simutu_sync.php` (pemetaan role per aplikasi + `source` = auto/database/snapshot)
+- Service sinkronisasi user + command `php artisan simutu:sync-users [--dry-run]`
+  → **khusus `monitoring-asuransi-rs` & `suratpermintaan`**.
+  Di `pengajuan-transportasi-rs` command ini **sudah tidak dipakai lagi**; sinkronisasi user
+  dilakukan lewat tombol "Sync dari Simutu" di halaman admin user (atau lazy-sync saat login).
+- `php artisan simutu:import-organisasi` → impor **Unit, Jabatan, dan akun user** dari snapshot JSON `database/data/simutu_organisasi.json` (menggantikan command sync user di aplikasi ini)
 - Lazy-sync saat login + blokir login untuk user dengan status `non-aktif`
 - Tombol "Sync dari Simutu" di halaman admin user
 
@@ -93,11 +97,14 @@ SIMUTU_DB_PASSWORD=<PASSWORD_YANG_DIBUAT_LANGKAH_2>
 
 ## 4. Verifikasi koneksi ke simutu
 
-Di tiap folder aplikasi, jalankan:
+Di folder aplikasi yang memiliki command (monitoring & suratpermintaan), jalankan:
 
 ```bash
 php artisan simutu:sync-users --dry-run
 ```
+
+> `pengajuan-transportasi-rs`: command ini sudah dihapus. Verifikasi koneksi cukup lewat
+> tombol "Sync dari Simutu" di halaman admin user, atau cek koneksi `simutu` via `php artisan tinker`.
 
 Output yang diharapkan (contoh):
 
@@ -115,9 +122,16 @@ Di tiap aplikasi (urutan penting — migrasi dulu):
 
 ```bash
 php artisan migrate --force
-php artisan simutu:sync-users --dry-run   # review dulu
-php artisan simutu:sync-users              # live
+php artisan simutu:sync-users --dry-run   # review dulu (monitoring & suratpermintaan)
+php artisan simutu:sync-users              # live         (monitoring & suratpermintaan)
 ```
+
+> `pengajuan-transportasi-rs` (tanpa command sync user):
+> ```bash
+> php artisan migrate --force
+> php artisan simutu:import-organisasi      # impor Unit + Jabatan + akun user dari snapshot JSON
+> ```
+> lalu klik "Sync dari Simutu" di halaman admin user (atau biarkan lazy-sync saat login).
 
 Jalankan di luar jam sibuk karena sync massal pertama menciptakan ratusan akun.
 
@@ -161,8 +175,8 @@ crontab -e
 ```
 # tiap 5 menit
 */5 * * * * cd /var/www/monitoring && php artisan simutu:sync-users --quiet >> storage/logs/simutu-sync.log 2>&1
-*/5 * * * * cd /var/www/transportasi && php artisan simutu:sync-users --quiet >> storage/logs/simutu-sync.log 2>&1
 */5 * * * * cd /var/www/suratpermintaan && php artisan simutu:sync-users --quiet >> storage/logs/simutu-sync.log 2>&1
+# transportasi: command sync user dihapus -> andalkan tombol "Sync dari Simutu" + lazy-sync saat login
 ```
 
 (Atau via Laravel scheduler: daftarkan di `routes/console.php` dan panggil `php artisan schedule:run` dari cron tiap menit.)
@@ -170,7 +184,7 @@ crontab -e
 ### Windows (Task Scheduler)
 
 1. Buat Task dengan trigger "Repeat every 5 minutes".
-2. Action → Program: `C:\path\php.exe`, Arguments: `C:\path\to\artisan simutu:sync-users`.
+2. Action → Program: `C:\path\php.exe`, Arguments: `C:\path\to\artisan simutu:sync-users` (monitoring & suratpermintaan).
 
 > Mode aman: tetap gunakan `--dry-run` di minggu pertama, atau jadwalkan di luar jam kerja, sambil memantau log.
 
@@ -193,7 +207,8 @@ crontab -e
 - [ ] Firewall/pg_hba mengizinkan server aplikasi ke port 5432
 - [ ] `.env` berisi `SIMUTU_*` yang benar di 3 aplikasi
 - [ ] `php artisan migrate --force` sukses di 3 aplikasi
-- [ ] `simutu:sync-users --dry-run` tidak error
+- [ ] `simutu:sync-users --dry-run` tidak error (monitoring & suratpermintaan)
+- [ ] `simutu:import-organisasi` sukses (pengajuan-transportasi-rs)
 - [ ] Sync live pertama sukses; verifikasi user + role tiap aplikasi
 - [ ] `config:cache` dijalankan ulang
 - [ ] (Opsional) Cron / Task Scheduler untuk sync berkala

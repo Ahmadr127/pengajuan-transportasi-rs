@@ -16,9 +16,9 @@ class UserSeeder extends Seeder
         User::updateOrCreate(
             ['username' => 'user.ahmad'],
             [
-                'first_name' => 'Ahmad',
-                'last_name' => 'Fauzi',
-                'username' => 'user.ahmad',
+                'first_name' => 'User',
+                'last_name' => 'User',
+                'username' => 'user',
                 'password' => Hash::make('rsazra'),
                 'role' => 'user',
                 'priority_level' => 0,

@@ -3,15 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreRoleRequest;
+use App\Http\Requests\Admin\UpdateRoleRequest;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Models\User;
-use App\Support\AclCache;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use App\Services\RoleService;
 
 class RoleController extends Controller
 {
+    public function __construct(private readonly RoleService $roles) {}
+
     public function index()
     {
         $roles = Role::query()
@@ -30,26 +31,9 @@ class RoleController extends Controller
         return view('admin.roles.create', compact('permissions', 'rolePermissions'));
     }
 
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
-        $data = $request->validate([
-            'name' => ['required', 'alpha_dash', 'max:50', 'unique:roles,name'],
-            'label' => ['required', 'string', 'max:100'],
-            'description' => ['nullable', 'string', 'max:255'],
-            'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['exists:permissions,id'],
-        ]);
-
-        $role = Role::create([
-            'name' => $data['name'],
-            'label' => $data['label'],
-            'description' => $data['description'] ?? null,
-            'is_locked' => false,
-            'is_super' => false,
-        ]);
-
-        $role->permissions()->sync($data['permissions'] ?? []);
-        AclCache::flush();
+        $this->roles->create($request->validated());
 
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role berhasil ditambahkan.');
@@ -63,39 +47,19 @@ class RoleController extends Controller
         return view('admin.roles.edit', compact('role', 'permissions', 'rolePermissions'));
     }
 
-    public function update(Request $request, Role $role)
+    public function update(UpdateRoleRequest $request, Role $role)
     {
         if ($role->is_super) {
             return back()->with('error', 'Role super admin tidak dapat diubah.');
         }
 
-        $data = $request->validate([
-            'name' => ['required', 'alpha_dash', 'max:50', Rule::unique('roles', 'name')->ignore($role->id)],
-            'label' => ['required', 'string', 'max:100'],
-            'description' => ['nullable', 'string', 'max:255'],
-            'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['exists:permissions,id'],
-        ]);
+        $data = $request->validated();
 
-        $oldName = $role->name;
-
-        if ($role->is_locked && $oldName !== $data['name']) {
+        if ($role->is_locked && $role->name !== $data['name']) {
             return back()->with('error', 'Nama role inti tidak dapat diubah.');
         }
 
-        $role->update([
-            'name' => $data['name'],
-            'label' => $data['label'],
-            'description' => $data['description'] ?? null,
-        ]);
-
-        if ($oldName !== $data['name']) {
-            User::whereHas('roles', fn ($q) => $q->where('roles.id', $role->id))
-                ->update(['role' => $data['name']]);
-        }
-
-        $role->permissions()->sync($data['permissions'] ?? []);
-        AclCache::flush();
+        $this->roles->update($role, $data);
 
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role berhasil diperbarui.');
@@ -111,8 +75,7 @@ class RoleController extends Controller
             return back()->with('error', 'Role masih dipakai user. Pindahkan user terlebih dahulu.');
         }
 
-        $role->delete();
-        AclCache::flush();
+        $this->roles->delete($role);
 
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role berhasil dihapus.');

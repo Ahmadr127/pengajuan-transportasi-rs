@@ -53,8 +53,16 @@
                 <div class="row g-3 mb-2">
                     <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Unit Kerja</label>
-                        <input type="text" name="unit_kerja" value="{{ old('unit_kerja', $user->unit_kerja) }}"
-                               class="form-control form-control-sm">
+                        @php($currentUnit = old('unit_kerja', $user->unit_kerja))
+                        <select name="unit_kerja" class="form-select form-select-sm">
+                            <option value="">-- Pilih Unit --</option>
+                            @foreach($units as $unit)
+                                <option value="{{ $unit->nama_unit }}" @selected($currentUnit === $unit->nama_unit)>{{ $unit->nama_unit }}</option>
+                            @endforeach
+                            @if($currentUnit && ! $units->contains('nama_unit', $currentUnit))
+                                <option value="{{ $currentUnit }}" selected>{{ $currentUnit }} (nilai lama)</option>
+                            @endif
+                        </select>
                     </div>
                     <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Posisi Pekerjaan</label>
@@ -75,8 +83,16 @@
                     </div>
                     <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Jabatan</label>
-                        <input type="text" name="jabatan" value="{{ old('jabatan', $user->jabatan) }}"
-                               class="form-control form-control-sm">
+                        @php($currentJabatan = old('jabatan', $user->jabatan))
+                        <select name="jabatan" class="form-select form-select-sm">
+                            <option value="">-- Pilih Jabatan --</option>
+                            @foreach($jobRoles as $jobRole)
+                                <option value="{{ $jobRole->nama_role }}" @selected($currentJabatan === $jobRole->nama_role)>{{ $jobRole->nama_role }}</option>
+                            @endforeach
+                            @if($currentJabatan && ! $jobRoles->contains('nama_role', $currentJabatan))
+                                <option value="{{ $currentJabatan }}" selected>{{ $currentJabatan }} (nilai lama)</option>
+                            @endif
+                        </select>
                     </div>
                 </div>
 

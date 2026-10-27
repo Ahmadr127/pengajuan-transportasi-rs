@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Services\Simutu\DatabaseSimutuUserSource;
+use App\Services\Simutu\SimutuUserSource;
+use App\Services\Simutu\SnapshotSimutuUserSource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -14,6 +17,9 @@ use Illuminate\Support\Facades\Log;
  *  - role lokal TIDAK ditimpa; hanya diisi saat user baru.
  *  - Password disalin dari simutu (hash bcrypt kompatibel).
  *  - Driver tetap dikelola manual via tabel drivers.
+ *
+ * Sumber data bisa berupa koneksi DB Simutu (utama) atau snapshot JSON
+ * (fallback offline) — lihat resolveSource() dan config `simutu_sync.source`.
  */
 class SimutuUserSyncService
 {
@@ -27,25 +33,35 @@ class SimutuUserSyncService
         return (string) config('simutu_sync.db_connection', 'simutu');
     }
 
-    protected function fetchSimutuUsers(): \Illuminate\Support\Collection
+    /**
+     * Pilih sumber data sesuai config `simutu_sync.source`:
+     *  - database : paksa pakai koneksi DB Simutu.
+     *  - snapshot : paksa pakai file JSON.
+     *  - auto     : coba DB Simutu, fallback ke snapshot JSON bila tak tersedia.
+     */
+    protected function resolveSource(): SimutuUserSource
     {
-        return DB::connection($this->connection())
-            ->table('users')
-            ->leftJoin('tbl_unit', 'users.unit_id', '=', 'tbl_unit.id')
-            ->leftJoin('tbl_role', 'users.role_id', '=', 'tbl_role.id')
-            ->select(
-                'users.id as simutu_id',
-                'users.nama_lengkap',
-                'users.nip',
-                'users.username',
-                'users.email',
-                'users.password',
-                'users.profesi',
-                'users.status_user',
-                'tbl_unit.nama_unit',
-                'tbl_role.nama_role'
-            )
-            ->get();
+        $mode = (string) config('simutu_sync.source', 'auto');
+        $connection = $this->connection();
+        $snapshotPath = (string) config('simutu_sync.organisasi_path');
+
+        if ($mode === 'snapshot') {
+            return new SnapshotSimutuUserSource($snapshotPath);
+        }
+
+        if ($mode === 'database') {
+            return new DatabaseSimutuUserSource($connection);
+        }
+
+        try {
+            DB::connection($connection)->getPdo();
+
+            return new DatabaseSimutuUserSource($connection);
+        } catch (\Throwable $e) {
+            Log::warning('Simutu DB tidak tersedia, memakai snapshot JSON: '.$e->getMessage());
+
+            return new SnapshotSimutuUserSource($snapshotPath);
+        }
     }
 
     public function syncForUsername(?string $username): ?User
@@ -55,26 +71,10 @@ class SimutuUserSyncService
         }
 
         try {
-            $simutu = DB::connection($this->connection())
-                ->table('users')
-                ->leftJoin('tbl_unit', 'users.unit_id', '=', 'tbl_unit.id')
-                ->leftJoin('tbl_role', 'users.role_id', '=', 'tbl_role.id')
-                ->select(
-                    'users.id as simutu_id',
-                    'users.nama_lengkap',
-                    'users.nip',
-                    'users.username',
-                    'users.email',
-                    'users.password',
-                    'users.profesi',
-                    'users.status_user',
-                    'tbl_unit.nama_unit',
-                    'tbl_role.nama_role'
-                )
-                ->where('users.username', $username)
-                ->first();
+            $simutu = $this->resolveSource()->findByUsername($username);
         } catch (\Throwable $e) {
             Log::warning('Simutu syncForUsername gagal: '.$e->getMessage());
+
             return null;
         }
 
@@ -83,6 +83,7 @@ class SimutuUserSyncService
         }
 
         $local = $this->findLocalUser((array) $simutu);
+
         return $this->applyToLocal((array) $simutu, $local, createIfMissing: true);
     }
 
@@ -137,7 +138,7 @@ class SimutuUserSyncService
     {
         $parts = preg_split('/\s+/', trim($namaLengkap));
         $first = $parts[0] ?? '';
-        $last  = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '';
+        $last = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '';
 
         return [$first, $last];
     }
@@ -208,19 +209,30 @@ class SimutuUserSyncService
     }
 
     /**
-     * Jalankan sinkronisasi penuh.
+     * Jalankan sinkronisasi penuh dari sumber yang dipilih config `simutu_sync.source`.
      *
      * @return array{created:int, updated:int, checked:int}
      */
     public function sync(bool $dryRun = false): array
     {
-        $stats = ['checked' => 0, 'created' => 0, 'updated' => 0];
-
         if (! $this->enabled()) {
-            return $stats;
+            return ['checked' => 0, 'created' => 0, 'updated' => 0];
         }
 
-        foreach ($this->fetchSimutuUsers() as $simutu) {
+        return $this->syncFromSource($this->resolveSource(), $dryRun);
+    }
+
+    /**
+     * Sinkronisasi dari sumber data tertentu (tanpa memeriksa flag `enabled`).
+     * Dipakai importer snapshot agar bisa menarik user dari file JSON juga.
+     *
+     * @return array{created:int, updated:int, checked:int}
+     */
+    public function syncFromSource(SimutuUserSource $source, bool $dryRun = false): array
+    {
+        $stats = ['checked' => 0, 'created' => 0, 'updated' => 0];
+
+        foreach ($source->all() as $simutu) {
             $stats['checked']++;
             $simutuArr = (array) $simutu;
             $local = $this->findLocalUser($simutuArr);

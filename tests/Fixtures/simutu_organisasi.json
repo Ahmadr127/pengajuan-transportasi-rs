@@ -1,0 +1,14 @@
+{
+    "roles": [
+        { "id": "1", "nama_role": "Administrator", "deskripsi_role": "Memiliki akses penuh ke semua fitur." },
+        { "id": "5", "nama_role": "Koordinator", "deskripsi_role": "Leader Ruangan." }
+    ],
+    "units": [
+        { "id": "9", "kode_unit": "UNIT009", "nama_unit": "Transportasi & kurir", "deskripsi_unit": null, "status_unit": "aktif" },
+        { "id": "23", "kode_unit": "UNIT023", "nama_unit": "IT", "deskripsi_unit": null, "status_unit": "aktif" }
+    ],
+    "users": [
+        { "id": "101", "nama_lengkap": "Aditya Pratama", "nip": "20263114", "username": "aditya.pratama", "email": "apratama@rsazra.co.id", "password": "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", "role_id": "5", "unit_id": "23", "profesi": "Non Medis", "atasan_langsung": "Muhamad Miftahudin", "status_user": "aktif" },
+        { "id": "102", "nama_lengkap": "Budi Santoso", "nip": "20260002", "username": "budi.santoso", "email": "bsantoso@rsazra.co.id", "password": "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", "role_id": "1", "unit_id": "9", "profesi": "Medis", "atasan_langsung": null, "status_user": "non-aktif" }
+    ]
+}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateRecurringTemplateRequest;
 use App\Models\RecurringTransportTemplate;
 use Illuminate\Http\Request;
 
@@ -31,16 +32,8 @@ class RecurringTransportTemplateController extends Controller
         return view('admin.recurring-templates.edit', compact('recurring_template'));
     }
 
-    public function update(Request $request, RecurringTransportTemplate $recurring_template)
+    public function update(UpdateRecurringTemplateRequest $request, RecurringTransportTemplate $recurring_template)
     {
-        $request->validate([
-            'is_active' => ['required', 'boolean'],
-            'hari' => ['required', 'array', 'min:1'],
-            'hari.*' => ['integer', 'min:1', 'max:7'],
-            'jam' => ['required', 'date_format:H:i'],
-            'jam_sampai' => ['nullable', 'date_format:H:i'],
-        ]);
-
         $recurring_template->update([
             'is_active' => $request->boolean('is_active'),
             'hari' => $request->hari,

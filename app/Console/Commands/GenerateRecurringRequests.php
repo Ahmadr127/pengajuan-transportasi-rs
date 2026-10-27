@@ -2,11 +2,10 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\RecurringTransportTemplate;
-use App\Models\TransportRequest;
+use App\Services\RecurringRequestService;
 use Carbon\Carbon;
-use Illuminate\Support\Str;
+use Illuminate\Console\Command;
 
 class GenerateRecurringRequests extends Command
 {
@@ -14,74 +13,47 @@ class GenerateRecurringRequests extends Command
 
     protected $description = 'Generate daily transport requests from active recurring templates';
 
+    public function __construct(private readonly RecurringRequestService $recurring)
+    {
+        parent::__construct();
+    }
+
     public function handle()
     {
         // Gunakan timezone aplikasi agar tidak meleset 1 hari di server UTC
-        $today      = Carbon::today(config('app.timezone'));
-        $dayOfWeek  = (int) $today->format('N'); // 1=Senin … 7=Minggu
+        $today = Carbon::today(config('app.timezone'));
 
         $activeTemplates = RecurringTransportTemplate::where('is_active', true)
             ->whereDate('start_date', '<=', $today->toDateString())
-            ->whereDate('end_date',   '>=', $today->toDateString())
+            ->whereDate('end_date', '>=', $today->toDateString())
             ->with('user')
             ->get();
 
         $count = 0;
 
         foreach ($activeTemplates as $template) {
-            // Cek apakah hari ini termasuk hari yang dipilih
-            $days = $template->hari ?? [];
-            if (!in_array($dayOfWeek, $days)) {
-                continue;
+            $result = $this->recurring->generateDailyFromTemplate($template);
+
+            switch ($result['status']) {
+                case 'skipped_duplicate':
+                    $skipNama = $template->user ? $template->user->full_name : 'user';
+                    $this->line("Skip (duplikat) template #{$template->id} — {$skipNama} jam {$template->jam}");
+                    break;
+
+                case 'skipped_no_user':
+                    $this->warn("Skip template #{$template->id} — user tidak ditemukan.");
+                    break;
+
+                case 'created':
+                    $count++;
+                    $nama = $template->user->full_name ?? "template #{$template->id}";
+                    $this->info("Dibuat #{$count} — {$nama} ({$template->jenis}, jam {$template->jam})");
+                    break;
+
+                case 'skipped_day':
+                default:
+                    break;
             }
-
-            // Cegah duplikasi: cek berdasarkan user_id + jenis + jam + tanggal hari ini
-            // (lebih ketat dari sebelumnya yang hanya cek keperluan)
-            $existing = TransportRequest::where('user_id', $template->user_id)
-                ->where('jenis',    $template->jenis)
-                ->where('jam',      $template->jam)
-                ->whereDate('tanggal', $today->toDateString())
-                ->exists();
-
-            if ($existing) {
-                $skipNama = $template->user ? $template->user->full_name : 'user';
-                $this->line("Skip (duplikat) template #{$template->id} — {$skipNama} jam {$template->jam}");
-                continue;
-            }
-
-            // Validasi user masih ada
-            if (!$template->user_id || !$template->user) {
-                $this->warn("Skip template #{$template->id} — user tidak ditemukan.");
-                continue;
-            }
-
-            TransportRequest::create([
-                'user_id'          => $template->user_id,
-                'jenis'            => $template->jenis,
-                'nomor_pengajuan'  => TransportRequest::generateNomor(),
-                'tanggal'          => $today->toDateString(),
-                'jam'              => substr($template->jam, 0, 5),
-                // tanggal_sampai & jam_sampai: isi hanya jika template punya jam_sampai
-                'tanggal_sampai'   => $template->jam_sampai ? $today->toDateString() : null,
-                'jam_sampai'       => $template->jam_sampai ? substr($template->jam_sampai, 0, 5) : null,
-                'keperluan'        => $template->keperluan,
-                'prioritas'        => $template->prioritas ?? 'biasa',
-                'pemohon_nama'     => $template->pemohon_nama ?? $template->user->full_name,
-                'pemohon_unit'     => $template->pemohon_unit ?? $template->user->unit_kerja,
-                'jumlah_penumpang' => $template->jumlah_penumpang,
-                'alamat_asal'      => $template->alamat_asal,
-                'alamat_tujuan'    => $template->alamat_tujuan,
-                'keterangan'       => $template->keterangan,
-                'pasien_nama'      => $template->pasien_nama,
-                'pasien_no_rm'     => $template->pasien_no_rm,
-                'kontak'           => '',
-                'signature_pemohon'    => Str::random(32),
-                'signature_pemohon_at' => now(),
-            ]);
-
-            $count++;
-            $nama = $template->user->full_name ?? "template #{$template->id}";
-            $this->info("Dibuat #{$count} — {$nama} ({$template->jenis}, jam {$template->jam})");
         }
 
         $this->info("✓ Total {$count} pengajuan berulang dibuat untuk hari ini ({$today->format('d/m/Y')}).");

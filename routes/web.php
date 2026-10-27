@@ -131,6 +131,12 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         ->middleware('permission:driver.manage');
     Route::resource('recurring-templates', \App\Http\Controllers\Admin\RecurringTransportTemplateController::class)
         ->middleware('permission:recurring.manage');
+    Route::resource('units', \App\Http\Controllers\Admin\UnitController::class)
+        ->except(['show'])
+        ->middleware('permission:unit.manage');
+    Route::resource('job-roles', \App\Http\Controllers\Admin\JobRoleController::class)
+        ->except(['show'])
+        ->middleware('permission:jabatan.manage');
 
     // Pengaturan RBAC
     Route::resource('roles', RoleController::class)

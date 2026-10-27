@@ -1,0 +1,130 @@
+{
+  "info": {
+    "name": "SIPETRANS API",
+    "description": "REST API untuk Sistem Pengajuan Transportasi RS Azra. Auth: Bearer token dari POST /auth/login. Set variable {{base_url}} dan {{token}} di environment.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        { "name": "Login", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/auth/login", "host": ["{{base_url}}"], "path": ["api","v1","auth","login"] }, "body": { "mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"password\"\n}" } } },
+        { "name": "Me", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/auth/me", "host": ["{{base_url}}"], "path": ["api","v1","auth","me"] } } },
+        { "name": "Logout", "request": { "method": "POST", "url": { "raw": "{{base_url}}/api/auth/logout", "host": ["{{base_url}}"], "path": ["api","v1","auth","logout"] } } }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        { "name": "List Users", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/users?per_page=15", "host": ["{{base_url}}"], "path": ["api","v1","users"], "query": [{ "key": "per_page", "value": "15" }] } } },
+        { "name": "Show User", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/users/1", "host": ["{{base_url}}"], "path": ["api","v1","users","1"] } } },
+        { "name": "Create User", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/users", "host": ["{{base_url}}"], "path": ["api","v1","users"] }, "body": { "mode": "raw", "raw": "{\n  \"nama_lengkap\": \"Budi Santoso\",\n  \"nip\": \"12345\",\n  \"password\": \"secret123\",\n  \"role_id\": 4,\n  \"priority_level\": 0\n}" } } },
+        { "name": "Update User", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/users/1", "host": ["{{base_url}}"], "path": ["api","v1","users","1"] }, "body": { "mode": "raw", "raw": "{\n  \"nama_lengkap\": \"Budi Santoso\",\n  \"role_id\": 4\n}" } } },
+        { "name": "Delete User", "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/api/users/1", "host": ["{{base_url}}"], "path": ["api","v1","users","1"] } } },
+        { "name": "Sync Simutu", "request": { "method": "POST", "url": { "raw": "{{base_url}}/api/users/sync-simutu", "host": ["{{base_url}}"], "path": ["api","v1","users","sync-simutu"] } } }
+      ]
+    },
+    {
+      "name": "Vehicles",
+      "item": [
+        { "name": "List Vehicles", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/vehicles", "host": ["{{base_url}}"], "path": ["api","v1","vehicles"] } } },
+        { "name": "Show Vehicle", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/vehicles/1", "host": ["{{base_url}}"], "path": ["api","v1","vehicles","1"] } } },
+        { "name": "Create Vehicle", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/vehicles", "host": ["{{base_url}}"], "path": ["api","v1","vehicles"] }, "body": { "mode": "raw", "raw": "{\n  \"name\": \"Mobil Umum 1\",\n  \"type\": \"umum\",\n  \"plate_number\": \"B 1234 AB\",\n  \"brand\": \"Toyota\",\n  \"model\": \"Avanza\",\n  \"year\": 2022,\n  \"capacity\": 7,\n  \"is_active\": true\n}" } } },
+        { "name": "Update Vehicle", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/vehicles/1", "host": ["{{base_url}}"], "path": ["api","v1","vehicles","1"] }, "body": { "mode": "raw", "raw": "{\n  \"name\": \"Mobil Umum 1\",\n  \"type\": \"umum\",\n  \"plate_number\": \"B 1234 AB\",\n  \"is_active\": true\n}" } } },
+        { "name": "Delete Vehicle", "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/api/vehicles/1", "host": ["{{base_url}}"], "path": ["api","v1","vehicles","1"] } } }
+      ]
+    },
+    {
+      "name": "Drivers",
+      "item": [
+        { "name": "List Drivers", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/drivers", "host": ["{{base_url}}"], "path": ["api","v1","drivers"] } } },
+        { "name": "Create Driver", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/drivers", "host": ["{{base_url}}"], "path": ["api","v1","drivers"] }, "body": { "mode": "raw", "raw": "{\n  \"name\": \"Driver Satu\",\n  \"phone\": \"08123456789\",\n  \"license_number\": \"SIM123\",\n  \"is_active\": true\n}" } } }
+      ]
+    },
+    {
+      "name": "Units",
+      "item": [
+        { "name": "List Units", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/units", "host": ["{{base_url}}"], "path": ["api","v1","units"] } } },
+        { "name": "Create Unit", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/units", "host": ["{{base_url}}"], "path": ["api","v1","units"] }, "body": { "mode": "raw", "raw": "{\n  \"kode_unit\": \"U001\",\n  \"nama_unit\": \"Unit Gawat Darurat\",\n  \"status_unit\": \"aktif\"\n}" } } }
+      ]
+    },
+    {
+      "name": "Job Roles",
+      "item": [
+        { "name": "List Job Roles", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/job-roles", "host": ["{{base_url}}"], "path": ["api","v1","job-roles"] } } },
+        { "name": "Create Job Role", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/job-roles", "host": ["{{base_url}}"], "path": ["api","v1","job-roles"] }, "body": { "mode": "raw", "raw": "{\n  \"nama_role\": \"Perawat\",\n  \"deskripsi_role\": \"Jabatan perawat\"\n}" } } }
+      ]
+    },
+    {
+      "name": "Roles (ACL)",
+      "item": [
+        { "name": "List Roles", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/roles", "host": ["{{base_url}}"], "path": ["api","v1","roles"] } } },
+        { "name": "Show Role", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/roles/1", "host": ["{{base_url}}"], "path": ["api","v1","roles","1"] } } },
+        { "name": "Create Role", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/roles", "host": ["{{base_url}}"], "path": ["api","v1","roles"] }, "body": { "mode": "raw", "raw": "{\n  \"name\": \"operator\",\n  \"label\": \"Operator\",\n  \"description\": \"Operator transportasi\",\n  \"permissions\": [1,2,3]\n}" } } }
+      ]
+    },
+    {
+      "name": "Permissions",
+      "item": [
+        { "name": "List Permissions", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/permissions", "host": ["{{base_url}}"], "path": ["api","v1","permissions"] } } }
+      ]
+    },
+    {
+      "name": "Menus",
+      "item": [
+        { "name": "List Menus", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/menus", "host": ["{{base_url}}"], "path": ["api","v1","menus"] } } }
+      ]
+    },
+    {
+      "name": "Transport Requests",
+      "item": [
+        { "name": "List Transport Requests", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/transport-requests", "host": ["{{base_url}}"], "path": ["api","v1","transport-requests"] } } },
+        { "name": "Show Transport Request", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/transport-requests/1", "host": ["{{base_url}}"], "path": ["api","v1","transport-requests","1"] } } },
+        { "name": "Create Umum", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/transport-requests", "host": ["{{base_url}}"], "path": ["api","v1","transport-requests"] }, "body": { "mode": "raw", "raw": "{\n  \"jenis\": \"umum\",\n  \"tanggal\": \"2026-10-28\",\n  \"jam\": \"08:00\",\n  \"tanggal_sampai\": \"2026-10-28\",\n  \"jam_sampai\": \"10:00\",\n  \"prioritas\": \"biasa\",\n  \"keperluan\": \"Rapat\",\n  \"alamat_tujuan\": \"Kantor Pusat\",\n  \"sampai_selesai\": false\n}" } } },
+        { "name": "Create Ambulance", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/transport-requests", "host": ["{{base_url}}"], "path": ["api","v1","transport-requests"] }, "body": { "mode": "raw", "raw": "{\n  \"jenis\": \"ambulance\",\n  \"purpose\": \"antar\",\n  \"pasien_nama\": \"Pasien A\",\n  \"pasien_no_rm\": \"RM001\",\n  \"alamat_pasien\": \"Jl. Contoh\",\n  \"tanggal\": \"2026-10-28\",\n  \"jam\": \"09:00\",\n  \"tanggal_sampai\": \"2026-10-28\",\n  \"jam_sampai\": \"11:00\",\n  \"prioritas\": \"segera\",\n  \"sampai_selesai\": false\n}" } } },
+        { "name": "Approve (diproses)", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/transport-requests/1", "host": ["{{base_url}}"], "path": ["api","v1","transport-requests","1"] }, "body": { "mode": "raw", "raw": "{\n  \"status\": \"diproses\"\n}" } } },
+        { "name": "Assign Unit & Driver", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/transport-requests/1", "host": ["{{base_url}}"], "path": ["api","v1","transport-requests","1"] }, "body": { "mode": "raw", "raw": "{\n  \"status\": \"digunakan\",\n  \"unit_mobil\": \"Mobil Umum 1\",\n  \"plat_nomor\": \"B 1234 AB\",\n  \"driver_id\": 1,\n  \"km_awal\": 1000\n}" } } },
+        { "name": "Complete", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/transport-requests/1/complete", "host": ["{{base_url}}"], "path": ["api","v1","transport-requests","1","complete"] }, "body": { "mode": "raw", "raw": "{\n  \"km_akhir\": 1050,\n  \"jam_kedatangan\": \"10:30\",\n  \"biaya_tol\": 15000\n}" } } },
+        { "name": "Cancel", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{base_url}}/api/transport-requests/1/cancel", "host": ["{{base_url}}"], "path": ["api","v1","transport-requests","1","cancel"] }, "body": { "mode": "raw", "raw": "{\n  \"rejection_reason\": \"Dibatalkan oleh admin\"\n}" } } },
+        { "name": "Print Data", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/transport-requests/1/print", "host": ["{{base_url}}"], "path": ["api","v1","transport-requests","1","print"] } } }
+      ]
+    },
+    {
+      "name": "Availability",
+      "item": [
+        { "name": "Check Umum", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/availability/umum?tanggal=2026-10-28&jam=08:00&tanggal_sampai=2026-10-28&jam_sampai=10:00", "host": ["{{base_url}}"], "path": ["api","v1","availability","umum"], "query": [{ "key": "tanggal", "value": "2026-10-28" }, { "key": "jam", "value": "08:00" }, { "key": "tanggal_sampai", "value": "2026-10-28" }, { "key": "jam_sampai", "value": "10:00" }] } } },
+        { "name": "Check Ambulance", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/availability/ambulance?tanggal=2026-10-28&jam=09:00&tanggal_sampai=2026-10-28&jam_sampai=11:00", "host": ["{{base_url}}"], "path": ["api","v1","availability","ambulance"], "query": [{ "key": "tanggal", "value": "2026-10-28" }, { "key": "jam", "value": "09:00" }, { "key": "tanggal_sampai", "value": "2026-10-28" }, { "key": "jam_sampai", "value": "11:00" }] } } }
+      ]
+    },
+    {
+      "name": "Recurring Templates",
+      "item": [
+        { "name": "List Recurring Templates", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/recurring-templates", "host": ["{{base_url}}"], "path": ["api","v1","recurring-templates"] } } }
+      ]
+    },
+    {
+      "name": "Signatures",
+      "item": [
+        { "name": "Signature Info", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/signatures/1", "host": ["{{base_url}}"], "path": ["api","v1","signatures","1"] } } },
+        { "name": "Sign", "request": { "method": "POST", "url": { "raw": "{{base_url}}/api/signatures/1", "host": ["{{base_url}}"], "path": ["api","v1","signatures","1"] } } },
+        { "name": "Verify Signature", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/signatures/verify/abc123", "host": ["{{base_url}}"], "path": ["api","v1","signatures","verify","abc123"] } } }
+      ]
+    },
+    {
+      "name": "Dashboard & Reports",
+      "item": [
+        { "name": "Dashboard", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/dashboard", "host": ["{{base_url}}"], "path": ["api","v1","dashboard"] } } },
+        { "name": "Report Transport", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/reports/transport", "host": ["{{base_url}}"], "path": ["api","v1","reports","transport"] } } },
+        { "name": "Export Report", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/reports/transport/export", "host": ["{{base_url}}"], "path": ["api","v1","reports","transport","export"] } } }
+      ]
+    }
+  ]
+}

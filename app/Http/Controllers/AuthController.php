@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use App\Services\LandingResolver;
 use App\Services\SimutuUserSyncService;
@@ -12,9 +13,7 @@ use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
-    public function __construct(private readonly LandingResolver $landing)
-    {
-    }
+    public function __construct(private readonly LandingResolver $landing) {}
 
     public function create()
     {
@@ -25,25 +24,22 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function store(Request $request)
+    public function store(LoginRequest $request)
     {
-        $request->validate([
-            'username' => ['required', 'string'],
-            'password' => ['required', 'string'],
-        ]);
-
+        $username = $request->validated('username');
+        $password = $request->validated('password');
         $remember = $request->boolean('remember');
 
         // Sinkronisasi ringan dari Simutu: segarkan profil + status user yang login.
         try {
-            app(SimutuUserSyncService::class)->syncForUsername($request->username);
+            app(SimutuUserSyncService::class)->syncForUsername($username);
         } catch (\Throwable $e) {
             Log::warning('Simutu lazy sync gagal saat login: '.$e->getMessage());
         }
 
-        $user = User::where('username', $request->username)->first();
+        $user = User::where('username', $username)->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($password, $user->password)) {
             return back()
                 ->withErrors(['username' => 'Username atau password salah.'])
                 ->onlyInput('username');

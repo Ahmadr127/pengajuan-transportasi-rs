@@ -52,8 +52,12 @@
                 <div class="row g-3 mb-2">
                     <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Unit Kerja</label>
-                        <input type="text" name="unit_kerja" value="{{ old('unit_kerja') }}"
-                               class="form-control form-control-sm">
+                        <select name="unit_kerja" class="form-select form-select-sm">
+                            <option value="">-- Pilih Unit --</option>
+                            @foreach($units as $unit)
+                                <option value="{{ $unit->nama_unit }}" @selected(old('unit_kerja') === $unit->nama_unit)>{{ $unit->nama_unit }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Posisi Pekerjaan</label>
@@ -74,8 +78,12 @@
                     </div>
                     <div class="col-6">
                         <label class="form-label text-xxs fw-600 text-slate-600">Jabatan</label>
-                        <input type="text" name="jabatan" value="{{ old('jabatan') }}"
-                               class="form-control form-control-sm">
+                        <select name="jabatan" class="form-select form-select-sm">
+                            <option value="">-- Pilih Jabatan --</option>
+                            @foreach($jobRoles as $jobRole)
+                                <option value="{{ $jobRole->nama_role }}" @selected(old('jabatan') === $jobRole->nama_role)>{{ $jobRole->nama_role }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
 

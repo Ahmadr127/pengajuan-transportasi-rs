@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             DriverSeeder::class,
             AclSeeder::class,
+            SimutuOrganisasiSeeder::class,
         ]);
     }
 }

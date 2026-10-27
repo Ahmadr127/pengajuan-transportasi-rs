@@ -10,7 +10,17 @@ export default defineConfig({
     ],
     server: {
         watch: {
-            ignored: ['**/storage/framework/views/**'],
+            // Abaikan folder non-frontend agar watcher tidak menyentuh berkas
+            // data/backup besar (mis. database/data/*.json) yang bisa ter-lock
+            // sehingga memicu EBUSY dan mematikan dev server.
+            ignored: [
+                '**/storage/**',
+                '**/database/**',
+                '**/vendor/**',
+                '**/node_modules/**',
+                '**/public/build/**',
+                '**/.git/**',
+            ],
         },
     },
 });

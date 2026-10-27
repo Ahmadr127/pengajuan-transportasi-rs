@@ -21,6 +21,12 @@ return [
 
     'db_connection' => env('SIMUTU_DB_CONNECTION', 'simutu'),
 
+    // Sumber data sync: auto (DB dulu, fallback snapshot JSON) | database | snapshot.
+    'source' => env('SIMUTU_SYNC_SOURCE', 'auto'),
+
+    // Snapshot master organisasi Simutu (roles/units/users) — untuk fallback & importer.
+    'organisasi_path' => database_path('data/simutu_organisasi.json'),
+
     'sync_password' => true,
 
     'block_login_statuses' => ['non-aktif'],

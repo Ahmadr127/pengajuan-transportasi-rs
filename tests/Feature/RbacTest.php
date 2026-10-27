@@ -19,6 +19,7 @@ class RbacTest extends TestCase
     {
         parent::setUp();
 
+        $this->withoutVite();
         $this->seed(AclSeeder::class);
     }
 
