@@ -1,4 +1,4 @@
-<x-app-layout title="Konfirmasi Tanda Tangan — SIPETRANS">
+<x-app title="Konfirmasi Tanda Tangan — SIPETRANS">
     <div class="mx-auto px-3 py-4" style="max-width:28rem;">
         <div class="sp-card overflow-hidden">
 
@@ -93,4 +93,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app>

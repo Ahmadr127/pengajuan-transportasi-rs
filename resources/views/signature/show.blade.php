@@ -1,4 +1,4 @@
-<x-app-layout title="Tanda Tangan Digital — SIPETRANS">
+<x-app title="Tanda Tangan Digital — SIPETRANS">
     <div class="mx-auto px-3 py-2" style="max-width:48rem;">
         <div class="sp-card p-3">
             <div class="text-center mb-3">
@@ -83,4 +83,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app>

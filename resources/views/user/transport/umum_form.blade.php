@@ -1,4 +1,4 @@
-<x-app-layout title="Pengajuan Umum — SIPETRANS">
+<x-app title="Pengajuan Umum — SIPETRANS">
 <div style="max-width:56rem;margin:0 auto;">
 
 {{-- Error Alert --}}
@@ -355,4 +355,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 </div>{{-- /max-width wrapper --}}
-</x-app-layout>
+</x-app>

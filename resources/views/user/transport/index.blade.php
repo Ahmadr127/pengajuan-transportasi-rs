@@ -1,4 +1,4 @@
-<x-app-layout title="Riwayat Pengajuan — SIPETRANS">
+<x-app title="Riwayat Pengajuan — SIPETRANS">
 <div class="mx-auto px-2 px-sm-3 pt-2 pb-4" style="max-width:56rem;">
 
     {{-- Header --}}
@@ -305,4 +305,4 @@
 </script>
 @endif
 
-</x-app-layout>
+</x-app>

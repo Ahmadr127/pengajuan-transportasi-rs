@@ -27,8 +27,9 @@ class MenuController extends Controller
         $permissions = Permission::orderBy('name')->pluck('name');
         $contexts = ['admin', 'user', 'driver'];
         $routeNames = $this->routeNames();
+        $parents = Menu::query()->orderBy('context')->orderBy('sort_order')->get();
 
-        return view('admin.menus.create', compact('permissions', 'contexts', 'routeNames'));
+        return view('admin.menus.create', compact('permissions', 'contexts', 'routeNames', 'parents'));
     }
 
     public function store(StoreMenuRequest $request)
@@ -45,8 +46,13 @@ class MenuController extends Controller
         $permissions = Permission::orderBy('name')->pluck('name');
         $contexts = ['admin', 'user', 'driver'];
         $routeNames = $this->routeNames();
+        $parents = Menu::query()
+            ->whereKeyNot($menu->getKey())
+            ->orderBy('context')
+            ->orderBy('sort_order')
+            ->get();
 
-        return view('admin.menus.edit', compact('menu', 'permissions', 'contexts', 'routeNames'));
+        return view('admin.menus.edit', compact('menu', 'permissions', 'contexts', 'routeNames', 'parents'));
     }
 
     public function update(UpdateMenuRequest $request, Menu $menu)

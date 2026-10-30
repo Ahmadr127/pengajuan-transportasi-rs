@@ -1,4 +1,4 @@
-<x-app-layout title="Riwayat Tugas — SIPETRANS">
+<x-app title="Riwayat Tugas — SIPETRANS">
     <div class="mx-auto px-3 pt-3 pb-20" style="max-width:64rem;" data-driver-page>
 
         {{-- Header --}}
@@ -256,4 +256,4 @@
         });
     </script>
 
-</x-app-layout>
+</x-app>

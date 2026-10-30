@@ -1,4 +1,4 @@
-<x-app-layout title="Buat Pengajuan — SIPETRANS">
+<x-app title="Buat Pengajuan — SIPETRANS">
 @php
     $total    = auth()->user()->transportRequests()->count();
     $pending  = auth()->user()->transportRequests()->where('status', 'diajukan')->count();
@@ -198,4 +198,4 @@
     </div>
 
 </div>
-</x-app-layout>
+</x-app>

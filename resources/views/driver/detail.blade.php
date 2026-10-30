@@ -1,4 +1,4 @@
-<x-app-layout title="Detail Tugas — SIPETRANS">
+<x-app title="Detail Tugas — SIPETRANS">
     <div class="mx-auto px-3 pt-3 pb-5" style="max-width:42rem;">
 
         <!-- Header -->
@@ -169,4 +169,4 @@
         @endif
 
     </div>
-</x-app-layout>
+</x-app>

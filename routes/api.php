@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DriverController;
 use App\Http\Controllers\Api\JobRoleController;
 use App\Http\Controllers\Api\MenuController;
+use App\Http\Controllers\Api\NavigationController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RecurringTemplateController;
 use App\Http\Controllers\Api\ReportController;
@@ -29,6 +30,7 @@ Route::get('/signatures/verify/{code}', [SignatureController::class, 'verify'])
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
     Route::get('/auth/me', [AuthController::class, 'me'])->name('api.auth.me');
+    Route::get('/me/navigation', [NavigationController::class, 'show'])->name('api.me.navigation');
 
     // Users
     Route::get('/users', [UserController::class, 'index'])->middleware('permission:user.manage')->name('api.users.index');

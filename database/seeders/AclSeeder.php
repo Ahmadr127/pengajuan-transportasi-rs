@@ -79,6 +79,10 @@ class AclSeeder extends Seeder
             'role.manage' => ['Kelola role & permission', 'Akses menu Role & Permission.'],
             'menu.manage' => ['Kelola menu', 'Akses menu Menu.'],
         ],
+        'Layout' => [
+            'layout.sidebar' => ['Layout sidebar', 'Tampilkan sidebar di halaman web.'],
+            'layout.topnav' => ['Layout top navbar', 'Tampilkan navbar atas di halaman web.'],
+        ],
     ];
 
     public const ROLE_PERMISSIONS = [
@@ -110,6 +114,7 @@ class AclSeeder extends Seeder
             'recurring.edit',
             'recurring.delete',
             'signature.sign',
+            'layout.sidebar',
         ],
         'user' => [
             'profile.view',
@@ -118,6 +123,7 @@ class AclSeeder extends Seeder
             'transport.request.history',
             'transport.request.print',
             'signature.sign',
+            'layout.topnav',
         ],
         'driver' => [
             'profile.view',
@@ -127,6 +133,7 @@ class AclSeeder extends Seeder
             'driver.task.cancel',
             'driver.task.print',
             'signature.sign',
+            'layout.topnav',
         ],
     ];
 
@@ -186,31 +193,45 @@ class AclSeeder extends Seeder
     {
         $menus = [
             // Admin
-            ['key' => 'admin.dashboard', 'context' => 'admin', 'section' => null, 'label' => 'Dashboard', 'route_name' => 'admin.dashboard', 'icon' => 'dashboard', 'permission_name' => 'dashboard.admin.view', 'sort_order' => 10, 'is_landing' => true, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.dashboard'],
-            ['key' => 'admin.transport', 'context' => 'admin', 'section' => null, 'label' => 'Daftar Pengajuan', 'route_name' => 'admin.transport.index', 'icon' => 'document', 'permission_name' => 'transport.request.view', 'sort_order' => 20, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.transport.*'],
-            ['key' => 'admin.report', 'context' => 'admin', 'section' => null, 'label' => 'Laporan', 'route_name' => 'admin.laporan', 'icon' => 'chart', 'permission_name' => 'report.view', 'sort_order' => 30, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.laporan*'],
-            ['key' => 'admin.users', 'context' => 'admin', 'section' => 'Master Data', 'label' => 'User / Akun', 'route_name' => 'admin.users.index', 'icon' => 'users', 'permission_name' => 'user.manage', 'sort_order' => 40, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.users.*'],
-            ['key' => 'admin.vehicles', 'context' => 'admin', 'section' => 'Master Data', 'label' => 'Kendaraan', 'route_name' => 'admin.vehicles.index', 'icon' => 'car', 'permission_name' => 'vehicle.manage', 'sort_order' => 50, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.vehicles.*'],
-            ['key' => 'admin.drivers', 'context' => 'admin', 'section' => 'Master Data', 'label' => 'Driver', 'route_name' => 'admin.drivers.index', 'icon' => 'driver', 'permission_name' => 'driver.manage', 'sort_order' => 60, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.drivers.*'],
-            ['key' => 'admin.recurring', 'context' => 'admin', 'section' => 'Master Data', 'label' => 'Pengajuan Berulang', 'route_name' => 'admin.recurring-templates.index', 'icon' => 'repeat', 'permission_name' => 'recurring.manage', 'sort_order' => 70, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.recurring-templates.*'],
-            ['key' => 'admin.units', 'context' => 'admin', 'section' => 'Master Data', 'label' => 'Unit', 'route_name' => 'admin.units.index', 'icon' => 'building', 'permission_name' => 'unit.manage', 'sort_order' => 45, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.units.*'],
-            ['key' => 'admin.jabatan', 'context' => 'admin', 'section' => 'Master Data', 'label' => 'Jabatan', 'route_name' => 'admin.job-roles.index', 'icon' => 'badge', 'permission_name' => 'jabatan.manage', 'sort_order' => 46, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.job-roles.*'],
+            ['key' => 'admin.dashboard', 'context' => 'admin', 'section' => null, 'label' => 'Dashboard', 'route_name' => 'admin.dashboard', 'icon' => 'dashboard', 'permission_name' => 'dashboard.admin.view', 'sort_order' => 10, 'is_landing' => true, 'show_sidebar' => true, 'show_bottom_nav' => true, 'active_pattern' => 'admin.dashboard'],
+            ['key' => 'admin.transport', 'context' => 'admin', 'section' => null, 'label' => 'Daftar Pengajuan', 'route_name' => 'admin.transport.index', 'icon' => 'document', 'permission_name' => 'transport.request.view', 'sort_order' => 20, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => true, 'active_pattern' => 'admin.transport.*'],
+            ['key' => 'admin.report', 'context' => 'admin', 'section' => null, 'label' => 'Laporan', 'route_name' => 'admin.laporan', 'icon' => 'chart', 'permission_name' => 'report.view', 'sort_order' => 30, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => true, 'active_pattern' => 'admin.laporan*'],
+
+            // Menu induk untuk mobile (bottom nav "Master"); tidak tampil di sidebar web.
+            ['key' => 'admin.master', 'context' => 'admin', 'section' => null, 'label' => 'Master', 'route_name' => null, 'icon' => 'storage', 'permission_name' => null, 'sort_order' => 40, 'is_landing' => false, 'show_sidebar' => false, 'show_bottom_nav' => true, 'active_pattern' => null],
+
+            ['key' => 'admin.users', 'parent' => 'admin.master', 'context' => 'admin', 'section' => 'Master Data', 'label' => 'User / Akun', 'route_name' => 'admin.users.index', 'icon' => 'users', 'permission_name' => 'user.manage', 'sort_order' => 40, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.users.*'],
+            ['key' => 'admin.vehicles', 'parent' => 'admin.master', 'context' => 'admin', 'section' => 'Master Data', 'label' => 'Kendaraan', 'route_name' => 'admin.vehicles.index', 'icon' => 'car', 'permission_name' => 'vehicle.manage', 'sort_order' => 50, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.vehicles.*'],
+            ['key' => 'admin.drivers', 'parent' => 'admin.master', 'context' => 'admin', 'section' => 'Master Data', 'label' => 'Driver', 'route_name' => 'admin.drivers.index', 'icon' => 'driver', 'permission_name' => 'driver.manage', 'sort_order' => 60, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.drivers.*'],
+            ['key' => 'admin.recurring', 'parent' => 'admin.master', 'context' => 'admin', 'section' => 'Master Data', 'label' => 'Pengajuan Berulang', 'route_name' => 'admin.recurring-templates.index', 'icon' => 'repeat', 'permission_name' => 'recurring.manage', 'sort_order' => 70, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.recurring-templates.*'],
+            ['key' => 'admin.units', 'parent' => 'admin.master', 'context' => 'admin', 'section' => 'Master Data', 'label' => 'Unit', 'route_name' => 'admin.units.index', 'icon' => 'building', 'permission_name' => 'unit.manage', 'sort_order' => 45, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.units.*'],
+            ['key' => 'admin.jabatan', 'parent' => 'admin.master', 'context' => 'admin', 'section' => 'Master Data', 'label' => 'Jabatan', 'route_name' => 'admin.job-roles.index', 'icon' => 'badge', 'permission_name' => 'jabatan.manage', 'sort_order' => 46, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.job-roles.*'],
+
             ['key' => 'admin.roles', 'context' => 'admin', 'section' => 'Pengaturan', 'label' => 'Role & Permission', 'route_name' => 'admin.roles.index', 'icon' => 'shield', 'permission_name' => 'role.manage', 'sort_order' => 80, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.roles.*'],
             ['key' => 'admin.menus', 'context' => 'admin', 'section' => 'Pengaturan', 'label' => 'Menu', 'route_name' => 'admin.menus.index', 'icon' => 'gear', 'permission_name' => 'menu.manage', 'sort_order' => 90, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => false, 'active_pattern' => 'admin.menus.*'],
+            ['key' => 'admin.profile', 'context' => 'admin', 'section' => null, 'label' => 'Profil', 'route_name' => 'profil', 'icon' => 'user', 'permission_name' => 'profile.view', 'sort_order' => 100, 'is_landing' => false, 'show_sidebar' => false, 'show_bottom_nav' => true, 'active_pattern' => 'profil'],
 
             // User
+            ['key' => 'user.dashboard', 'context' => 'user', 'section' => null, 'label' => 'Dashboard', 'route_name' => 'dashboard', 'icon' => 'dashboard', 'permission_name' => 'transport.request.create', 'sort_order' => 5, 'is_landing' => false, 'show_sidebar' => false, 'show_bottom_nav' => true, 'active_pattern' => 'dashboard'],
             ['key' => 'user.transport.create', 'context' => 'user', 'section' => null, 'label' => 'Pengajuan', 'route_name' => 'dashboard', 'icon' => 'home', 'permission_name' => 'transport.request.create', 'sort_order' => 10, 'is_landing' => true, 'show_sidebar' => true, 'show_bottom_nav' => true, 'active_pattern' => 'home,pengajuan.choose,pengajuan.umum*,pengajuan.ambulance*'],
             ['key' => 'user.transport.history', 'context' => 'user', 'section' => null, 'label' => 'Riwayat', 'route_name' => 'pengajuan.index', 'icon' => 'history', 'permission_name' => 'transport.request.history', 'sort_order' => 20, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => true, 'active_pattern' => 'pengajuan.index,pengajuan.success,pengajuan.print'],
             ['key' => 'user.profile', 'context' => 'user', 'section' => null, 'label' => 'Profil', 'route_name' => 'profil', 'icon' => 'user', 'permission_name' => 'profile.view', 'sort_order' => 30, 'is_landing' => false, 'show_sidebar' => false, 'show_bottom_nav' => true, 'active_pattern' => 'profil'],
 
             // Driver
-            ['key' => 'driver.task', 'context' => 'driver', 'section' => null, 'label' => 'Tugas Saya', 'route_name' => 'driver.dashboard', 'icon' => 'home', 'permission_name' => 'driver.task.view', 'sort_order' => 10, 'is_landing' => true, 'show_sidebar' => true, 'show_bottom_nav' => true, 'active_pattern' => 'driver.dashboard'],
+            ['key' => 'driver.dashboard', 'context' => 'driver', 'section' => null, 'label' => 'Dashboard', 'route_name' => 'driver.dashboard', 'icon' => 'dashboard', 'permission_name' => 'driver.task.view', 'sort_order' => 5, 'is_landing' => false, 'show_sidebar' => false, 'show_bottom_nav' => true, 'active_pattern' => 'driver.dashboard'],
+            ['key' => 'driver.task', 'context' => 'driver', 'section' => null, 'label' => 'Tugas', 'route_name' => 'driver.dashboard', 'icon' => 'assignment', 'permission_name' => 'driver.task.view', 'sort_order' => 10, 'is_landing' => true, 'show_sidebar' => true, 'show_bottom_nav' => true, 'active_pattern' => 'driver.dashboard'],
             ['key' => 'driver.history', 'context' => 'driver', 'section' => null, 'label' => 'Riwayat', 'route_name' => 'driver.history', 'icon' => 'history', 'permission_name' => 'driver.task.history', 'sort_order' => 20, 'is_landing' => false, 'show_sidebar' => true, 'show_bottom_nav' => true, 'active_pattern' => 'driver.history'],
             ['key' => 'driver.profile', 'context' => 'driver', 'section' => null, 'label' => 'Profil', 'route_name' => 'driver.profil', 'icon' => 'user', 'permission_name' => 'driver.task.view', 'sort_order' => 30, 'is_landing' => false, 'show_sidebar' => false, 'show_bottom_nav' => true, 'active_pattern' => 'driver.profil'],
         ];
 
         foreach ($menus as $menu) {
-            Menu::updateOrCreate(['key' => $menu['key']], $menu);
+            $parentKey = $menu['parent'] ?? null;
+            $attributes = $menu;
+            unset($attributes['parent']);
+            if ($parentKey !== null) {
+                $attributes['parent_id'] = Menu::query()->where('key', $parentKey)->value('id');
+            }
+            Menu::updateOrCreate(['key' => $attributes['key']], $attributes);
         }
     }
 }

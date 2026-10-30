@@ -26,7 +26,9 @@ class TransportRequestController extends BaseApiController
     {
         $user = $request->user();
 
-        if ($user->hasPermission('transport.request.view')) {
+        // Pengguna yang boleh melihat dashboard admin juga boleh melihat semua pengajuan,
+        // agar angka "total" di dashboard konsisten dengan daftar (tidak kosong).
+        if ($user->hasPermission('transport.request.view') || $user->hasPermission('dashboard.admin.view')) {
             $filters = $request->all();
             $filters['per_page'] = $request->get('per_page', 10);
             $items = $this->query->adminIndex($filters);

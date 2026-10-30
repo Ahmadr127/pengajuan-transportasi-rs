@@ -1,4 +1,4 @@
-<x-app-layout title="Profil Saya">
+<x-app title="Profil Saya">
 <div class="sp-content pb-5">
     <div class="container py-3" style="max-width:480px;">
 
@@ -76,4 +76,4 @@
 
     </div>
 </div>
-</x-app-layout>
+</x-app>

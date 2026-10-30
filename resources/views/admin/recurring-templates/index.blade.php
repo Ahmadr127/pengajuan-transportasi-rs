@@ -1,4 +1,4 @@
-<x-app-layout title="Master Pengajuan Berulang — SIPETRANS">
+<x-app title="Master Pengajuan Berulang — SIPETRANS">
     <div class="container-fluid px-3 pt-4 pb-4">
         <h1 class="fw-bold text-slate-800 mb-0" style="font-size:1.1rem;">
             Master Pengajuan Berulang
@@ -146,4 +146,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app>

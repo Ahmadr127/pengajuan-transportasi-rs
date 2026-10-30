@@ -1,4 +1,4 @@
-<x-app-layout title="Master Jabatan — SIPETRANS">
+<x-app title="Master Jabatan — SIPETRANS">
     <div class="container-fluid px-3 pt-4 pb-6">
 
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -112,4 +112,4 @@
         </script>
 
     </div>
-</x-app-layout>
+</x-app>

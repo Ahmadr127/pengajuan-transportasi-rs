@@ -1,4 +1,4 @@
-<x-app-layout title="Sudah Ditandatangani — SIPETRANS">
+<x-app title="Sudah Ditandatangani — SIPETRANS">
     <div class="mx-auto px-3 py-4" style="max-width:28rem;">
         <div class="sp-card overflow-hidden">
             <div class="px-4 py-4 text-center" style="background-color:#475569;">
@@ -20,4 +20,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app>

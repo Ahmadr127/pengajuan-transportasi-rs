@@ -9,6 +9,8 @@
     $adminContext = $context === 'admin';
     $historyRoute = $menuService->routeFor($user, 'driver.history')
         ?? $menuService->routeFor($user, 'user.transport.history');
+    $useSidebar = $user->isSuperAdmin() || $user->hasPermission('layout.sidebar');
+    $useTopNav = $user->hasPermission('layout.topnav') && ! $useSidebar;
 @endphp
 <!doctype html>
 <html lang="id">
@@ -139,7 +141,7 @@
         <header class="sp-navbar">
             <div class="px-3 py-3 d-flex align-items-center justify-content-between gap-3">
 
-                @if($sidebarMenu->isNotEmpty())
+                @if($useSidebar && $sidebarMenu->isNotEmpty())
                     <button @click="sidebarOpen = !sidebarOpen" type="button" class="sp-nav-btn d-lg-none shrink-0 sp-header-btn-hover">
                         <svg style="width:1.25rem;height:1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -158,6 +160,18 @@
                         <div class="text-xxs fw-500" style="color:#81BD41;">Sistem Pengajuan Transportasi</div>
                     </div>
                 </a>
+
+                @if($useTopNav && $bottomMenu->isNotEmpty())
+                    <nav class="d-none d-md-flex align-items-center gap-1 ms-3">
+                        @foreach($bottomMenu as $menu)
+                            <a href="{{ $menu->href() }}"
+                               class="px-3 py-2 rounded text-sm fw-500 text-decoration-none {{ $menu->isActive() ? 'text-white' : 'text-slate-600' }}"
+                               style="{{ $menu->isActive() ? 'background:#007774;' : '' }}">
+                                {{ $menu->label }}
+                            </a>
+                        @endforeach
+                    </nav>
+                @endif
 
                 <div class="d-flex align-items-center gap-3 ms-auto">
 
@@ -491,7 +505,7 @@
         <div class="d-flex flex-grow-1 position-relative">
 
             {{-- Sidebar Overlay (mobile) --}}
-            @if($sidebarMenu->isNotEmpty())
+            @if($useSidebar && $sidebarMenu->isNotEmpty())
                 <div x-show="sidebarOpen" @click="sidebarOpen = false"
                     x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0"
                     x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300"
@@ -500,7 +514,7 @@
             @endif
 
             {{-- Sidebar --}}
-            @if($sidebarMenu->isNotEmpty())
+            @if($useSidebar && $sidebarMenu->isNotEmpty())
                 <aside :class="sidebarOpen ? '' : 'sp-sidebar-hidden'"
                     class="sp-sidebar {{ $adminContext ? 'sp-sidebar-lg-show' : '' }}">
 

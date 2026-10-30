@@ -1,4 +1,4 @@
-<x-app-layout title="Edit Kendaraan — SIPETRANS">
+<x-app title="Edit Kendaraan — SIPETRANS">
     <div class="px-3 pt-3 pb-4" style="max-width:42rem;margin:0 auto;"
          x-data="{ editType: '{{ old('type', $vehicle->type) }}' }">
 
@@ -85,4 +85,4 @@
             </form>
         </div>
     </div>
-</x-app-layout>
+</x-app>

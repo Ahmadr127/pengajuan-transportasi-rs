@@ -1,4 +1,4 @@
-<x-app-layout title="Edit Driver — SIPETRANS">
+<x-app title="Edit Driver — SIPETRANS">
     <div class="px-3 pt-3 pb-4" style="max-width:42rem;margin:0 auto;">
 
         <div class="d-flex align-items-center gap-2 mb-3">
@@ -70,4 +70,4 @@
             </form>
         </div>
     </div>
-</x-app-layout>
+</x-app>

@@ -1,4 +1,4 @@
-<x-app-layout title="Edit Pengguna — SIPETRANS">
+<x-app title="Edit Pengguna — SIPETRANS">
     <div class="px-3 pt-3 pb-4" style="max-width:48rem;margin:0 auto;"
          x-data="Object.assign(usernameGenEdit('{{ old('nama_lengkap', $user->full_name) }}', '{{ $user->username }}'), { editPriorityLevel: '{{ old('priority_level', $user->priority_level ?? 0) }}' })">
 
@@ -144,4 +144,4 @@
             }
         }
     </script>
-</x-app-layout>
+</x-app>

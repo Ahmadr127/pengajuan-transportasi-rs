@@ -1,4 +1,4 @@
-<x-app-layout title="Manajemen Kendaraan — SIPETRANS">
+<x-app title="Manajemen Kendaraan — SIPETRANS">
     <div class="container-fluid px-3 pt-4 pb-6">
 
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -254,4 +254,4 @@
         </div>
 
     </div>
-</x-app-layout>
+</x-app>

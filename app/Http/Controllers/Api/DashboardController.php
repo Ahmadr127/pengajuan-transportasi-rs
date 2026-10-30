@@ -63,11 +63,18 @@ class DashboardController extends BaseApiController
         $myActive = TransportRequest::where('user_id', $user->id)->where('status', 'digunakan')->count();
         $myDone = TransportRequest::where('user_id', $user->id)->where('status', 'selesai')->count();
 
+        $latest = TransportRequest::with('user')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->limit(5)
+            ->get();
+
         return $this->success([
             'my_total' => $myTotal,
             'my_pending' => $myPending,
             'my_active' => $myActive,
             'my_done' => $myDone,
+            'latest' => \App\Http\Resources\TransportRequestResource::collection($latest),
         ]);
     }
 }

@@ -1,4 +1,4 @@
-<x-app-layout title="Status Pengajuan — SIPETRANS">
+<x-app title="Status Pengajuan — SIPETRANS">
     @php
         $statusCfg = match ($item->status) {
             'diajukan' => ['badge-amber', 'bg-amber-50', 'border-amber-300', 'bg-amber-400', 'Diajukan'],
@@ -339,4 +339,4 @@
         </div>{{-- end stack --}}
 
     </div>
-</x-app-layout>
+</x-app>

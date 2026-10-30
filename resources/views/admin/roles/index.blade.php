@@ -1,4 +1,4 @@
-<x-app-layout title="Role & Permission — SIPETRANS">
+<x-app title="Role & Permission — SIPETRANS">
     <div class="container-fluid px-3 pt-4 pb-6">
 
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -76,4 +76,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app>

@@ -1,4 +1,4 @@
-<x-app-layout title="Dashboard Admin — SIPETRANS">
+<x-app title="Dashboard Admin — SIPETRANS">
     <div class="container-fluid px-2 px-sm-3 px-md-4 pt-2 pt-sm-3 pb-4 pb-sm-5">
         <!-- Header -->
         <div class="mb-3 mb-sm-4">
@@ -216,4 +216,4 @@
 
         </div>
     </div>
-</x-app-layout>
+</x-app>

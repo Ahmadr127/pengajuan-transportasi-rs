@@ -1,4 +1,4 @@
-<x-app-layout title="Detail Pengajuan — SIPETRANS">
+<x-app title="Detail Pengajuan — SIPETRANS">
     @php
         $colors = [
             'diajukan' => ['badge' => 'badge-amber', 'dot' => 'bg-amber-400'],
@@ -823,4 +823,4 @@
             }
         });
     </script>
-</x-app-layout>
+</x-app>

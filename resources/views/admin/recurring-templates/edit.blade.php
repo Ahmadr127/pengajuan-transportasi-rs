@@ -1,4 +1,4 @@
-<x-app-layout title="Edit Template Pengajuan Berulang — SIPETRANS">
+<x-app title="Edit Template Pengajuan Berulang — SIPETRANS">
     <div class="px-3 py-4" style="max-width:42rem;margin:0 auto;">
         <div class="d-flex align-items-center gap-3 mb-3">
             <a href="{{ route('admin.recurring-templates.index') }}"
@@ -176,4 +176,4 @@
             if (sampaiSelesaiCb) sampaiSelesaiCb.addEventListener('change', updatePreview);
         });
     </script>
-</x-app-layout>
+</x-app>

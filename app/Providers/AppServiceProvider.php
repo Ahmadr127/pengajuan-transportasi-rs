@@ -28,6 +28,10 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
 
+        // Komponen layout di resources/views/layouts/ dapat dipanggil
+        // sebagai <x-layouts.app>, <x-layouts.guest>, <x-layouts.login>.
+        \Illuminate\Support\Facades\Blade::anonymousComponentPath(resource_path('views/layouts'));
+
         // Semua permission dari database dipakai sebagai Gate ability.
         Gate::before(function (?User $user, string $ability) {
             if (! $user) {

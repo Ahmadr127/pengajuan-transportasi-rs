@@ -1,4 +1,4 @@
-<x-app-layout title="Manajemen Pengguna — SIPETRANS">
+<x-app title="Manajemen Pengguna — SIPETRANS">
     <div class="container-fluid px-3 pt-4 pb-6">
 
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -239,4 +239,4 @@
             });
         });
     </script>
-</x-app-layout>
+</x-app>

@@ -1,4 +1,4 @@
-<x-app-layout title="Detail Laporan — SIPETRANS">
+<x-app title="Detail Laporan — SIPETRANS">
     <div class="container-fluid px-3 px-sm-4 pt-4 pb-5" style="max-width:56rem;">
 
         {{-- Header --}}
@@ -257,4 +257,4 @@
         </div>
 
     </div>
-</x-app-layout>
+</x-app>

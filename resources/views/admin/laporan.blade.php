@@ -1,4 +1,4 @@
-<x-app-layout title="Laporan — SIPETRANS">
+<x-app title="Laporan — SIPETRANS">
     <div class="container-fluid px-3 px-sm-4 pt-4 pb-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <div>
@@ -290,4 +290,4 @@
             });
         });
     </script>
-</x-app-layout>
+</x-app>

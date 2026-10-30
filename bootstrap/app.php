@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'permission' => \App\Http\Middleware\PermissionMiddleware::class,
         ]);
+        $middleware->appendToGroup('api', \App\Http\Middleware\LogApiRequests::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

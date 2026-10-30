@@ -1,4 +1,4 @@
-<x-app-layout title="Dashboard — SIPETRANS">
+<x-app title="Dashboard — SIPETRANS">
     <div class="mx-auto px-3 pt-4 pb-20" style="max-width:42rem;" data-driver-page>
 
         {{-- ── TOP HEADER WITH ICONS ── --}}
@@ -356,4 +356,4 @@
             });
         });
     </script>
-</x-app-layout>
+</x-app>

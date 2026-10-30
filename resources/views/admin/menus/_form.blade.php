@@ -31,6 +31,22 @@
             </select>
         </div>
         <div class="col-md-4">
+            <label class="form-label text-xxs fw-600 text-slate-600">Menu Induk</label>
+            <select name="parent_id" class="form-select form-select-sm">
+                <option value="">— tanpa induk —</option>
+                @foreach(collect($parents ?? [])->groupBy('context') as $parentContext => $group)
+                    <optgroup label="{{ ucfirst($parentContext) }}">
+                        @foreach($group as $parent)
+                            <option value="{{ $parent->id }}" @selected((string) old('parent_id', $menu->parent_id ?? '') === (string) $parent->id)>
+                                {{ $parent->label }} ({{ $parent->key }})
+                            </option>
+                        @endforeach
+                    </optgroup>
+                @endforeach
+            </select>
+            <div class="form-text text-xxs">Dipakai sebagai sub-menu di mobile (mis. Master).</div>
+        </div>
+        <div class="col-md-4">
             <label class="form-label text-xxs fw-600 text-slate-600">Section</label>
             <input type="text" name="section" value="{{ old('section', $menu->section ?? '') }}"
                    placeholder="mis. Master Data" class="form-control form-control-sm">

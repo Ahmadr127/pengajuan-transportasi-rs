@@ -1,4 +1,4 @@
-<x-app-layout title="Daftar Pengajuan — SIPETRANS">
+<x-app title="Daftar Pengajuan — SIPETRANS">
     <div class="container-fluid px-3 px-sm-4 pt-4 pt-sm-5 pb-4">
         <h1 class="fs-5 fw-bold text-slate-800">
             Daftar Pengajuan Transportasi
@@ -266,4 +266,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app>
